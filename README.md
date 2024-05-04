@@ -17,6 +17,7 @@
   - System: 32-bit, 64-bit
   - Kernel version: 6.6
   - Debian version: 12 (bookworm)
+  - Default Python: Python 3.11.2 (main, Mar 13 2023, 12:18:29) [GCC 12.2.0] on linux
 
 ## 依存ライブラリ
 - [LINE Messaging API SDK for Python](https://github.com/line/line-bot-sdk-python)
