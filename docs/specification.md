@@ -15,11 +15,15 @@
 ### Usersテーブル
 | user_id                           | role              | state | request_time       |
 | --------------------------------- | ----------------- | ----- | ------------------ |
-| U8189cf6745fc0d808977bdb0b9f22995 | User              | 1     | 2020-01-01 0:00:00 |
-| U8189cf6745fc0d808977bdb0b9f22996 | ADMIN             | 2     | 2020-01-01 0:00:00 |
-| U8189cf6745fc0d808977bdb0b9f22997 | UNAUTHORIZED_USER | 0     | 2020-01-01 0:00:00 |
+| U8189cf6745fc0d808977bdb0b9f22995 | 1              | 1     | 2020-01-01 0:00:00 |
+| U8189cf6745fc0d808977bdb0b9f22996 | 2             | 2     | 2020-01-01 0:00:00 |
+| U8189cf6745fc0d808977bdb0b9f22997 | 0 | 0     | 2020-01-01 0:00:00 |
 - user_id : (STRING, PRIMARY_KEY) LINE APIから提供されるユーザーID [参考](https://developers.line.biz/ja/docs/messaging-api/getting-user-ids/#what-is-user-id)
-- role : (ENUM, NOT NULL) BANNED_USER or UNAUTHORIZED_USER or USER or ADMIN
+- role : (INTEGER, NOT NULL) -1 <= role <= 2
+  - -1 : BANNED_USER
+  - 0 : UNAUTHORIZED_USER
+  - 1 : USER
+  - 2 : ADMIN
 - state : (INTEGER, NOT NULL) メッセージによるリクエストの状態管理
   - デフォルトは`0`
   - サーバー起動時に全ユーザーのstateが`0`にリセットされる
@@ -34,7 +38,7 @@ CREATE TABLE IF NOT EXISTS users (
     role INTEGER DEFAULT 0 NOT NULL,
     state INTEGER DEFAULT 0 NOT NULL,
     request_time TEXT DEFAULT NULL,
-    CHECK (role = "BANNED_USER" or "UNAUTHORIZED_USER" or "USER" or "ADMIN")
+    CHECK (role >= -1 AND role <= 2),
 );
 ```
 

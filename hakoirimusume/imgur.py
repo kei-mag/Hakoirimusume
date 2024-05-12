@@ -21,10 +21,13 @@ import requests
 IMGUR_API_URI = r'https://api.imgur.com/3'
 
 
-def upload_as_anonymous(client_id: str,
-                        file: bytes | BufferedReader,
-                        type: Literal['image', 'video'] = 'image',
-                        name: str | None = None) -> tuple[str, str] | str:
+def upload_as_anonymous(
+    client_id: str,
+    file: bytes | BufferedReader,
+    type: Literal["image", "video"] = "image",
+    name: str | None = None,
+    verbose: bool = False,
+) -> tuple[str, str] | str:
     """Upload image or video files anonymously to imgur.com
 
     Parameters
@@ -42,21 +45,25 @@ def upload_as_anonymous(client_id: str,
     -------
     tuple[str, str] | str
         If the file is successfully uploaded, tuple with a link to the file and a deletehash is returned.
-        If it fails, the contents of the response body are returned in text.
+        If it fails, the contents of the response body are returned as text.
     """
     header = {
         "Authorization": f"Client-ID {client_id}"
     }
     payload = {
         "type": "file",
-        "title": "Rabbit's House Report Image",
-        "description": "This image is posted by LINE BOT \"箱入り娘\" automatically."
+        "title": "Rabbit’s House Report Image － today",
+        "description": 'This image is posted by LINE BOT "箱入り娘" automatically.',
     }
     files = [(type, file)]
     if name is not None:
         payload["name"] = name
-    response = requests.post(IMGUR_API_URI+'/upload',
-                             headers=header, data=payload, files=files)
+    response = requests.post(IMGUR_API_URI + "/image", headers=header, data=payload, files=files)
+    if verbose:
+        print("Request:")
+        print("    Header:", header)
+        print("    Payload:", payload)
+        print("    Files:", files)
     if response.status_code == 200:
         response_json = json.JSONDecoder().decode(response.text)
         return response_json["data"]["link"], response_json["data"]["deletehash"]
