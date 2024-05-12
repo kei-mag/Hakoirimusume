@@ -1,14 +1,20 @@
 import os
 import re
+import sys
 
 import hakoirimusume.enhanced_yaml as enhanced_yaml
+
+
+class ConfigurationError(Exception):
+    pass
 
 
 class Config:
     def __init__(self, file: str = "./config.yml") -> None:
         self.__config_dict = enhanced_yaml.safe_load(open(file, "r", encoding="UTF-8"))
         self.__config_file = file
-        # print(self.__config_dict)
+        # print("config-file: ", file)
+        # print("config: ", self.__config_dict)
 
     def get(self, key: str, default=None):
         try:
@@ -53,5 +59,8 @@ class Config:
     #     with open(self.__config_file, "w", encoding="UTF-8") as stream:
     #         self.yaml.dump(self.__config_dict, stream)
 
-
-config = Config()  # Use this normally.
+# print("config is created.")
+if m := re.search(r"\s*--config-file=(.+)\s*", " ".join(sys.argv)):
+    config = Config(file=m[1])  # Use this normally.
+else:
+    config = Config()

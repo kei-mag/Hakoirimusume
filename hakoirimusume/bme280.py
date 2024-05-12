@@ -63,18 +63,21 @@ class BME280:
                 self.digH[i] = (-self.digH[i] ^ 0xFFFF) + 1
 
     def read_data(self):
-        data = []
-        for i in range(0xF7, 0xF7+8):
-            data.append(self.bus.read_byte_data(self.i2c_address, i))
-        pres_raw = (data[0] << 12) | (data[1] << 4) | (data[2] >> 4)
-        temp_raw = (data[3] << 12) | (data[4] << 4) | (data[5] >> 4)
-        hum_raw = (data[6] << 8) | data[7]
+        try:
+            data = []
+            for i in range(0xF7, 0xF7 + 8):
+                data.append(self.bus.read_byte_data(self.i2c_address, i))
+            pres_raw = (data[0] << 12) | (data[1] << 4) | (data[2] >> 4)
+            temp_raw = (data[3] << 12) | (data[4] << 4) | (data[5] >> 4)
+            hum_raw = (data[6] << 8) | data[7]
+        except Exception as e:
+            return None
 
         ret = []
         ret.append(self.compensate_T(temp_raw))
         ret.append(self.compensate_P(pres_raw))
         ret.append(self.compensate_H(hum_raw))
-        return ret
+        return tuple(ret)
 
     def compensate_P(self, adc_P):
         global t_fine

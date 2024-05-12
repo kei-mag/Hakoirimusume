@@ -4,9 +4,6 @@
 # ${VAR_NAME} will be replaced with the value of the environment variable VAR_NAME.
 # See docs/configuration.md for more information.
 
-# For testing
-os.environ.path: ${PATH}
-
 # Flask server
 server.port: 8080
 

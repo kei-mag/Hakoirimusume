@@ -50,7 +50,7 @@ hakoirimusume:
       header: null  # String | null, ignored if type is not POST
       body: null  # String | null, ignored if type is not POST
       success-message: "冷房を点けたよ！"  # String | null
-      failure-message: "冷房を点けるのに失敗しちゃった、部屋に来て点けて！"  # String | null
+      failure-message: "冷房を点けるのに失敗しちゃった😱\n部屋に来て点けて！🙏"  # String | null
   # Aikotoba configs
   aikotoba:
     timeout: 60  # sec.
@@ -63,10 +63,12 @@ hakoirimusume:
   remote-shutdown:
     enable: true
     available-authority-level: user  # user | admin
-    exec: "sudo shutdown -h now"
+    command: "sudo shutdown -h -t 15"
+    success-message: "15秒後にシャットダウンするね\nおやすみなさい😴"
+    failure-message: "シャットダウンに失敗しちゃった😱\n設置した人にきいてみて！🙏"
 
 # Generative filepaths
 filepaths:
   database: "./hakoirimusume.db"
   sensor-data: "./sensor-data.csv"
-  log: "./hakoirimusume.log"
+  log-dir: ".logs"

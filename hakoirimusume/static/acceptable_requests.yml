@@ -3,12 +3,15 @@ request_type:
   - &invite_user invite_user
   - &open_menu open_menu
   - &request_report request_report
-  - &turn_on_leave_mode turn_on_leave_mode
-  - &turn_off_leave_mode turn_off_leave_mode
+  # - &turn_on_leave_mode turn_on_leave_mode
+  # - &turn_off_leave_mode turn_off_leave_mode
   - &delete_user_data delete_user_data
   - &open_settings open_settings
   - &configure_tempature configure_tempature
   - &shutdown_server shutdown_server
+  # - &ban_user ban_user
+  # - &unban_user unban_user
+  # - &logout_user logout_user
 
 request_query:
   "ユーザー認証": *authorize
@@ -21,16 +24,16 @@ request_query:
   "元気": *request_report
   "げんき？": *request_report
   "げんき": *request_report
-  "行ってきます！": *turn_on_leave_mode
-  "いってきます！": *turn_on_leave_mode
-  "行ってきます。": *turn_on_leave_mode
-  "いってきます。": *turn_on_leave_mode
-  "行ってきます": *turn_on_leave_mode
-  "いってきます": *turn_on_leave_mode
-  "ただいま！": *turn_off_leave_mode
-  "ただいま。": *turn_off_leave_mode
-  "ただいま": *turn_off_leave_mode
-  "新しいユーザーを追加": *invite_user
+  # "行ってきます！": *turn_on_leave_mode
+  # "いってきます！": *turn_on_leave_mode
+  # "行ってきます。": *turn_on_leave_mode
+  # "いってきます。": *turn_on_leave_mode
+  # "行ってきます": *turn_on_leave_mode
+  # "いってきます": *turn_on_leave_mode
+  # "ただいま！": *turn_off_leave_mode
+  # "ただいま。": *turn_off_leave_mode
+  # "ただいま": *turn_off_leave_mode
+  "新しいユーザーを招待": *invite_user
   "私のユーザー認証情報を削除して": *delete_user_data
   "システム設定を開いて": *open_settings
   "通知温度を変更する": *configure_tempature
@@ -52,3 +55,10 @@ request_query:
   "キャンセル": no
   "だめ": no
   "ダメ": no
+
+states:
+  waiting_for_aikotoba: 1
+  waiting_for_confirm_invitation: 2
+  waiting_for_confirm_shutdown: 3
+  waiting_for_confirm_delete_user_data: 4
+  waiting_for_confirm_configure_tempature: 5
