@@ -1,0 +1,62 @@
+# Hakoirimusume configuration file
+
+spring.application.name: Hakoirimusume
+
+server:
+  port : 8080
+
+line.bot:
+  channel-token: ${LINE_CHANNEL_ACCESS_TOKEN}  # Put your Channel Access Token or ${env_val_name} to specify environment variable.
+  channel-secret: ${LINE_CHANNEL_SECRET}  # Put your Channel Secret or ${env_val_name} to specify environment variable.
+  handler.path: /callback  # LINE Messaging API Webhook URL will be "{Hakoirimusume server URL}{this value}".
+
+#imgur.client-id: null  # Put your Imgur Client ID or specify null for anonymous upload
+#
+#sensors:
+#  camera: true
+#  bme280.i2c-bus: 1  # integer value, default I2C bus number is 1.
+#  bme280.i2c-addr: 0x76  # hex value, run 'i2cdetect -y {i2c-bus}' to check I2C address of BME280 sensor.
+#
+#hakoirimusume:
+#  alert:
+#    trigger-limit:
+#      interval: 3 # hours each
+#      daily-limit: null # times
+#    condition:
+#      # current temperature or humidity >= {these value}  --->  send alert
+#      temp: null  # integer, float or null (no temperature condition)
+#      humid: null  # integer, float or null (no humidity condition)
+#    execute-action:
+#      type: null  # "GET" | "POST" | "COMMAND" | null (no action will be executed)
+#      # The following placeholders are available in 'target', 'header', 'body'.
+#      # {{IMAGE_URL} : Imgur URL of image (will be replaced with empty string when camera image is not available)
+#      # {{TEMP}} : Current temperature (e.g., 25.0)
+#      # {{HUMID}} : Current humidity (e.g., 50.0)
+#      # {{PRESSURE}} : Current pressure (e.g., 1013.0)
+#      # {{DATE}} : yyyymmdd string of current date (e.g., 20240425)
+#      # {{TIME}} : HHMMSS string of current local time (e.g., 113911)
+#      target: "triggered-script.sh arg1 arg2"  # String, specify URL (when type is "GET" or "POST") or command (when type is "COMMAND")
+#      header: "POST Header" # null (no header) | String, contents of request header, valid only when type is "POST", this value will be ignored when type is not "POST"
+#      body: "POST Body"  # String, contents of request body, valid only when type is "POST", this value will be ignored when type is not "POST"
+#      success-message: "エアコンを点けたよ！"  # This string will be sent to users with alert on success executing action.
+#      failure-message: "エアコンを点けるのに失敗しちゃったよ..."  # This string will be sent to users with alert on failure executing action.
+#  aikotoba:
+#    sheeds: [ # aikotoba will be "{Random value of 1st list}{Random value of 2nd list}{Random value of 3rd list}..."
+#      ["お利口で", "かしこくて", "賢くて", "かわいくて", "可愛くて", "キュートで", "げんきで", "元気で", "人見知りで", "優しくて"],
+#      ["ご機嫌な", "自立した", "よく食べる", "食欲旺盛な", "天才な", "なんでも食べる？", "長寿な", "長生きな", "甘えん坊な", "癒される"],
+#      ["うさぎ", "ウサギ", "Rabbit", "ラビット", "うさちゃん", "うさぎちゃん", "箱入り娘", "耳の長い家族", "ドワーフ", "お姫さま"]
+#    ]
+#    expired-time: 60  # sec. After this value seconds, user need to regenerate new aikotoba.
+#
+#  info.show-private-ip: true
+#
+#  files:
+#    general-database: "sql.db"
+#    black-list-file: "blacklist.json"
+
+
+# To remove Client wire logs. Please comment out following lines.
+# See: https://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html
+#
+#logging.level:
+#   com.linecorp.bot.client.wire: INFO
