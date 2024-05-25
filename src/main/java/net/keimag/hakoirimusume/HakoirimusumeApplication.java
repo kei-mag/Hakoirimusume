@@ -29,13 +29,13 @@ public class HakoirimusumeApplication {
 		SpringApplication.run(HakoirimusumeApplication.class, args);
 	}
 
-	public HakoirimusumeApplication(MessagingApiClient messagingApiClient) throws IOException {
+	public HakoirimusumeApplication(MessagingApiClient messagingApiClient) throws IOException{
 		this.messagingApiClient = messagingApiClient;
-		this.rabbitsHouseReportSupplier = new RabbitsHouseReportSupplier("src/main/resources/static/report_template.json", new BME280(1, 0x76));
+		this.rabbitsHouseReportSupplier = new RabbitsHouseReportSupplier("src/main/resources/templates/report_template.json", new BME280(1, 0x76));
 	}
 
 	@EventMapping
-	public void handleTextMessageEvent(MessageEvent event) {
+	public void handleTextMessageEvent(MessageEvent event) throws IOException, InterruptedException {
 		System.out.println("event: " + event);
 		final String originalMessageText = ((TextMessageContent) event.message()).text();
 		messagingApiClient.showLoadingAnimation(new ShowLoadingAnimationRequest(event.source().userId(), 30));

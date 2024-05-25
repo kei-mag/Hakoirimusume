@@ -15,9 +15,6 @@ import org.slf4j.Logger;
 public class BME280 {
     private static final Console console = new Console(); // Pi4J Logger helper
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(BME280.class);
-    private final Context pi4j;
-    private final I2CProvider i2cProvider;
-    private final I2CConfig i2cConfig;
     private final I2C bme280Sensor;
 
     public static class BME280Data {
@@ -48,14 +45,14 @@ public class BME280 {
     }
 
     public BME280(int i2cBusNumber, int i2cAddr) {
-        this.pi4j = Pi4J.newAutoContext();
-        this.i2cProvider = pi4j.provider("linuxfs-i2c");
-        i2cConfig = I2C.newConfigBuilder(pi4j)
-        .id("BME280")
-        .name("BME280")
-        .bus(i2cBusNumber)
-        .device(i2cAddr)
-        .build();
+        Context pi4j = Pi4J.newAutoContext();
+        I2CProvider i2cProvider = pi4j.provider("pigpio-i2c");
+        I2CConfig i2cConfig = I2C.newConfigBuilder(pi4j)
+                .id("BME280")
+                .name("BME280")
+                .bus(i2cBusNumber)
+                .device(i2cAddr)
+                .build();
         I2C sensor;
         try {
             sensor = i2cProvider.create(i2cConfig);
@@ -75,12 +72,7 @@ public class BME280 {
         }
     }
 
-    /**
-     * The chip will be reset, forcing the POR (PowerOnReset)
-     * steps to occur. Once completes the chip will be configured
-     * to operate 'forced' mode and single sample.
-     * @throws Exception
-     */
+
     private void resetSensor() throws Exception {
         I2C device = this.bme280Sensor;
         int rc = device.writeRegister(BMP280Declares.reset, BMP280Declares.reset_cmd);
@@ -107,8 +99,9 @@ public class BME280 {
         ctlReg &= ~BMP280Declares.presOverSampleMsk;   // mask off all pressure bits
         ctlReg |= BMP280Declares.ctl_pressSamp1;   //  Pressure oversample 1
 
-        byte[] regVal = new byte[1];
-        regVal[0] = (byte)(BMP280Declares.ctrl_meas);
+//        byte[] regVal = new byte[1];
+//        regVal[0] = (byte)(BMP280Declares.ctrl_meas);
+        int regVal = BMP280Declares.ctrl_meas;
         byte[] ctlVal = new byte[1];
         ctlVal[0] = (byte) ctlReg;
 
@@ -130,8 +123,9 @@ public class BME280 {
         byte[] buffHum = new byte[2];
         device.readRegister(BMP280Declares.hum_msb, buffHum);
         long adc_H = (long) ((buffHum[0] & 0xFF) << 8) | (long) (buffHum[1] & 0xFF);
-        byte[] readReg = new byte[1];
-        readReg[0] = (byte) BMP280Declares.reg_dig_t1;
+//        byte[] readReg = new byte[1];
+//        readReg[0] = (byte) BMP280Declares.reg_dig_t1;
+        int readReg = BMP280Declares.reg_dig_t1;
 
         byte[] compVal = new byte[2];
 
