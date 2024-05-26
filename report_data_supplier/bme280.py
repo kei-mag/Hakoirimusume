@@ -63,6 +63,13 @@ class BME280:
                 self.digH[i] = (-self.digH[i] ^ 0xFFFF) + 1
 
     def read_data(self):
+        """Read temperature, humid, pressure from BME280 Sensor
+
+        Returns
+        -------
+        tuple[float, float, float]
+            tuple of (temperature, humid, pressure)
+        """
         try:
             data = []
             for i in range(0xF7, 0xF7 + 8):
