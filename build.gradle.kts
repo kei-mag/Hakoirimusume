@@ -14,13 +14,11 @@ java {
 
 repositories {
 	mavenCentral()
-	maven {
-		url = uri("https://jitpack.io")
-	}
 }
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.projectlombok:lombok:1.18.30")
 	compileOnly("org.springframework.boot:spring-boot-configuration-processor") // for adding custom configuration to application.yml
 
@@ -43,18 +41,8 @@ dependencies {
 	// for HTTP Request
 	implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-	// for BME280 Sensor Support
-	implementation ("com.pi4j:pi4j-core:2.1.1")
-	implementation ("com.pi4j:pi4j-plugin-raspberrypi:2.1.1")
-	implementation ("com.pi4j:pi4j-plugin-pigpio:2.1.1")
-
-	// for PiCamera Support
-//	implementation("uk.co.caprica:picam:2.0.2")
-//	implementation ("com.github.Hopding:JRPiCam:1.1.1")
-
 	// for SQLite3 Support
 	implementation("org.xerial:sqlite-jdbc:3.45.3.0")
-
 
 	// for general testing
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

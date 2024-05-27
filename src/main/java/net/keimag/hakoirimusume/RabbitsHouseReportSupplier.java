@@ -4,7 +4,6 @@ import com.linecorp.bot.messaging.model.FlexMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,7 +22,7 @@ public class RabbitsHouseReportSupplier implements Supplier<FlexMessage> {
     private final SimpleDateFormat numericDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     private final DecimalFormat df = new DecimalFormat("0.0");
 
-    public RabbitsHouseReportSupplier(String templateJsonPath, BME280 bme280) throws IOException {
+    public RabbitsHouseReportSupplier(String templateJsonPath) throws IOException {
         this.templateJson = Files.readString(Path.of(templateJsonPath));
     }
 
@@ -77,7 +76,6 @@ public class RabbitsHouseReportSupplier implements Supplier<FlexMessage> {
 
     private String getReportJson() throws IOException, InterruptedException {
         String reportJson = templateJson;
-//        BME280.BME280Data bme280Data = this.bme280.getMeasurements();
         String temp = "---", humidity = "---", pressure = "---";
 //        if (bme280Data != null) {
 //            temp = df.format(bme280Data.temperature);

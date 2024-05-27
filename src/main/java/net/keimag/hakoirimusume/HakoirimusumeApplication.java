@@ -31,7 +31,7 @@ public class HakoirimusumeApplication {
 
 	public HakoirimusumeApplication(MessagingApiClient messagingApiClient) throws IOException{
 		this.messagingApiClient = messagingApiClient;
-		this.rabbitsHouseReportSupplier = new RabbitsHouseReportSupplier("src/main/resources/templates/report_template.json", new BME280(1, 0x76));
+		this.rabbitsHouseReportSupplier = new RabbitsHouseReportSupplier("src/main/resources/templates/report_template.json");
 	}
 
 	@EventMapping
