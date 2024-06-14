@@ -3,6 +3,8 @@ package net.keimag.hakoirimusume;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -22,7 +24,7 @@ public class HakoirimusumeProperties {
     private String databasePath = "./hakoirimusume.db";
 
     @Data
-    @Configuration
+    @SpringBootConfiguration
     public static class SensorComponentProperties {
         private String host = "localhost";
         @Min(1)
@@ -30,14 +32,14 @@ public class HakoirimusumeProperties {
     }
     
     @Data
-    @Configuration
+    @SpringBootConfiguration
     public static class AlertProperties {
         private TriggerLimitProperties triggerLimit = new TriggerLimitProperties();
         private ConditionProperties condition = new ConditionProperties();
         private ActionProperties action = new ActionProperties();
 
         @Data
-        @Configuration
+        @SpringBootConfiguration
         public static class TriggerLimitProperties {
             @Min(0)
             private int interval = 3;
@@ -45,14 +47,14 @@ public class HakoirimusumeProperties {
         }
         
         @Data
-        @Configuration
+        @SpringBootConfiguration
         public static class ConditionProperties {
             private double temperature = -1;
             private double humidity = -1;
         }
 
         @Data
-        @Configuration
+        @SpringBootConfiguration
         public static class ActionProperties {
             @Pattern(regexp = "GET|POST|COMMAND", message ="type can be \"GET\", \"POST\", \"COMMAND\" or null.")
             private String type = null;
@@ -65,16 +67,16 @@ public class HakoirimusumeProperties {
     }
     
     @Data
-    @Configuration
+    @SpringBootConfiguration
     public static class AikotobaProperties {
         @NotNull
         private List<List<String>> seeds = new ArrayList<>();
         @Min(0)
-        private int timeoutSec = 60;
+        private int timeoutSec = 0;
     }
 
     @Data
-    @Configuration
+    @SpringBootConfiguration
     public static class InfoProperties {
         private boolean showPrivateIp = true;
     }

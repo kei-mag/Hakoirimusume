@@ -5,6 +5,13 @@ spring.application.name: Hakoirimusume
 server:
   port : 8080
 
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:;DB_CLOSE_ON_EXIT=TRUE;MODE=PostgreSQL
+    username: sa
+    password:
+
 line.bot:
   channel-token: ${LINE_CHANNEL_ACCESS_TOKEN}  # Put your Channel Access Token or ${env_val_name} to specify environment variable.
   channel-secret: ${LINE_CHANNEL_SECRET}  # Put your Channel Secret or ${env_val_name} to specify environment variable.
@@ -36,7 +43,7 @@ hakoirimusume:
       header: "POST Header" # null (no header) | String, contents of request header, valid only when type is "POST", this value will be ignored when type is not "POST"
       body: "POST Body"  # String, contents of request body, valid only when type is "POST", this value will be ignored when type is not "POST"
       success-message: "エアコンを点けたよ！"  # This string will be sent to users with alert on success executing action.
-      failure-message: "エアコンを点けるのに失敗しちゃったよ..."  # This string will be sent to users with alert on failure executing action.
+      failure-message: "冷房を点けるのに失敗しちゃった😱\n部屋に来て点けてほしいな！🙏"  # This string will be sent to users with alert on failure executing action.
   aikotoba:
     seeds: [ # aikotoba will be "{Random value of 1st list}{Random value of 2nd list}{Random value of 3rd list}..."
       ["お利口で", "かしこくて", "賢くて", "かわいくて", "可愛くて", "キュートで", "げんきで", "元気で", "人見知りで", "優しくて"],
@@ -45,6 +52,13 @@ hakoirimusume:
     ]
     timeout-sec: 60 # sec. After this value seconds, user need to regenerate new aikotoba.
   info.show-private-ip: true
+#  remote-shutdown:
+#    enable: true
+#    available-role: user  # user | admin
+#    command: "sudo shutdown -h -t 15"
+#    success-message: "15秒後にシャットダウンするね\nおやすみなさい😴"
+#    failure-message: "シャットダウンに失敗しちゃった😱\n設置した人にきいてみて！🙏"
+#  request.timeout: 300  # sec.
 
 
 # To remove Client wire logs. Please comment out following lines.

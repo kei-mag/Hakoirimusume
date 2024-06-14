@@ -35,7 +35,7 @@ public class Authorizer {
             this.expirationPeriod = Calendar.getInstance();
             this.expirationPeriod.add(Calendar.SECOND, aikotobaProperties.getTimeoutSec());
             this.generationUser = generationUser;
-            log.debug("Aikotoba: {}", this.aikotoba);
+            log.debug("Aikotoba: {}, User: {}, Expiration: {}, Now: {}", this.aikotoba, this.generationUser, this.expirationPeriod.getTime(), Calendar.getInstance().getTime());
             return this.aikotoba;
         }
     }
@@ -55,15 +55,15 @@ public class Authorizer {
 
     @SuppressWarnings("StatementWithEmptyBody")
     private void invalidateAikotoba() {
+        log.debug("Invalidating Aikotoba");
         if (StringUtils.isBlank(aikotoba) || StringUtils.isBlank(generationUser)) {
             deleteAikotoba();
         }
-        if (!Objects.isNull(expirationPeriod) && !expirationPeriod.after(Calendar.getInstance()) && !Objects.isNull(generationUser)) {
+        if (!Objects.isNull(expirationPeriod) && Calendar.getInstance().before(this.expirationPeriod) && !Objects.isNull(generationUser)) {
             /* do nothing (still valid) */
         } else {
             deleteAikotoba();
         }
-        log.debug("aikotoba: {}, generationUser: {}, expirationPeriod: {}", aikotoba, generationUser, expirationPeriod);
     }
 
     private void deleteAikotoba() {

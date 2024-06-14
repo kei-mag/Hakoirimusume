@@ -20,7 +20,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.projectlombok:lombok:1.18.30")
+	annotationProcessor("org.projectlombok:lombok:1.18.30")
+	testCompileOnly("org.projectlombok:lombok:1.18.30")
+	testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 	compileOnly("org.springframework.boot:spring-boot-configuration-processor") // for adding custom configuration to application.yml
+	testCompileOnly("org.springframework.boot:spring-boot-configuration-processor") // for adding custom configuration to application.yml
 
 	// LINE Bot SDK
 	implementation("com.linecorp.bot:line-bot-messaging-api-client:8.6.0")
@@ -42,7 +46,8 @@ dependencies {
 	implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
 	// for SQLite3 Support
-	implementation("org.xerial:sqlite-jdbc:3.45.3.0")
+//	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+	implementation("org.komamitsu:spring-data-sqlite:1.0.0")
 
 	// for general testing
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
