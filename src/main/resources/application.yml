@@ -1,4 +1,5 @@
 # Hakoirimusume configuration file
+# Relative path is available from Hakoirimusume root directory.
 
 spring.application.name: Hakoirimusume
 
@@ -7,10 +8,13 @@ server:
 
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:;DB_CLOSE_ON_EXIT=TRUE;MODE=PostgreSQL
-    username: sa
-    password:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:hakoirimusume.db
+    username: hakoirimusume
+    password: hm35712db7
+  sql.init.mode: always
+  jpa.database-platform: org.hibernate.community.dialect.SQLiteDialect
+  jpa.open-in-view: false
 
 line.bot:
   channel-token: ${LINE_CHANNEL_ACCESS_TOKEN}  # Put your Channel Access Token or ${env_val_name} to specify environment variable.
@@ -18,18 +22,25 @@ line.bot:
   handler.path: /callback  # LINE Messaging API Webhook URL will be "{Hakoirimusume server URL}{this value}".
 
 hakoirimusume:
-  sensor-component:
+  richmenu:
+    for-authorized-user: richmenu-926d8a458c54f8efbca72b268a485a46  # Rich menu ID for authorized user
+  sensor-server:
     # Configure sensor component, see also: README.md
-    host: localhost # IP Address or URL of server which provides camera and sensor data.
-    port: 80 # port number of server
+    endpoint: http://Test-Pi.local/ # Endpoint for sensor data & camera image
+    no-camera-endpoint : http://localhost/get?nocamera  # Endpoint for no camera image
   alert:
-    trigger-limit:
-      interval: 3 # hours each
-      daily-limit: -1 # times, if you'd like to specify -1, no limit will be applied.
+    to: [ # LINE user / group ID list to send alert
+#      "Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+#      "Uyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+    ]
+    polling-interval-sec: 300 # sec. >= 10
     condition:
       # current temperature or humidity >= {these value}  --->  send alert
       temperature: -1  # integer, float or -1 (no temperature condition)
       humidity: -1  # integer, float or -1 (no humidity condition)
+    trigger-limit:
+      interval: 3 # hours each
+      daily-limit: -1 # times, if you'd like to specify -1, no limit will be applied.
     action:
       type: null  # "GET" | "POST" | "COMMAND" | null (no action will be executed)
       # The following placeholders are available in 'target', 'header', 'body'.
@@ -52,13 +63,13 @@ hakoirimusume:
     ]
     timeout-sec: 60 # sec. After this value seconds, user need to regenerate new aikotoba.
   info.show-private-ip: true
-#  remote-shutdown:
-#    enable: true
-#    available-role: user  # user | admin
-#    command: "sudo shutdown -h -t 15"
-#    success-message: "15秒後にシャットダウンするね\nおやすみなさい😴"
-#    failure-message: "シャットダウンに失敗しちゃった😱\n設置した人にきいてみて！🙏"
-#  request.timeout: 300  # sec.
+  remote-shutdown:
+    enable: true
+    available-role: user  # user | admin
+    command: "sudo shutdown -h -t 15"
+    success-message: "15秒後にシャットダウンするね\nおやすみなさい😴"
+    failure-message: "シャットダウンに失敗しちゃった😱\n設置した人にきいてみて！🙏"
+  request.timeout-sec: 300  # sec.
 
 
 # To remove Client wire logs. Please comment out following lines.

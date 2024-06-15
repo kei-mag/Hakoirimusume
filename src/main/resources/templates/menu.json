@@ -1,359 +1,359 @@
 {
-    "type": "carousel",
-    "contents": [
-      {
-        "type": "bubble",
-        "size": "nano",
-        "header": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "機能紹介",
-              "color": "#ffffff",
-              "align": "center",
-              "size": "md",
-              "gravity": "center",
-              "wrap": true
-            }
-          ],
-          "backgroundColor": "#27AC02",
-          "paddingTop": "19px",
-          "paddingAll": "12px",
-          "paddingBottom": "16px"
-        },
-        "body": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "最初に見た機能紹介ムービーをもう一度再生するよ",
-              "size": "xs",
-              "wrap": true
-            }
-          ],
-          "spacing": "md",
-          "paddingAll": "12px"
-        },
-        "footer": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "separator"
-            },
-            {
-              "type": "button",
-              "action": {
-                "type": "message",
-                "label": "見てみる",
-                "text": "チュートリアルムービーを見せて"
-              }
-            }
-          ]
-        },
-        "styles": {
-          "footer": {
-            "separator": false
+  "type": "carousel",
+  "contents": [
+    {
+      "type": "bubble",
+      "size": "nano",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "機能紹介",
+            "color": "#ffffff",
+            "align": "center",
+            "size": "md",
+            "gravity": "center",
+            "wrap": true
           }
-        }
+        ],
+        "backgroundColor": "#27AC02",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "16px"
       },
-      {
-        "type": "bubble",
-        "size": "nano",
-        "header": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "認証許可設定",
-              "color": "#ffffff",
-              "align": "center",
-              "size": "md",
-              "gravity": "center",
-              "wrap": true
-            }
-          ],
-          "backgroundColor": "#f4a460",
-          "paddingTop": "19px",
-          "paddingAll": "12px",
-          "paddingBottom": "16px"
-        },
-        "body": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "新規のユーザー認証をロック・許可します。\n(普段はロック!)",
-              "size": "xs",
-              "wrap": true
-            }
-          ],
-          "spacing": "md",
-          "paddingAll": "12px"
-        },
-        "footer": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "separator"
-            },
-            {
-              "type": "button",
-              "action": {
-                "type": "message",
-                "label": "設定する",
-                "text": "ユーザー認証機能の設定"
-              }
-            }
-          ]
-        },
-        "styles": {
-          "footer": {
-            "separator": false
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "わたしが出来ることを紹介するね！",
+            "size": "xs",
+            "wrap": true
           }
-        }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px"
       },
-      {
-        "type": "bubble",
-        "size": "nano",
-        "header": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "システム設定",
-              "color": "#ffffff",
-              "align": "center",
-              "size": "md",
-              "gravity": "center",
-              "wrap": true
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "separator"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "message",
+              "label": "見てみる",
+              "text": "どんな事が出来るの？"
             }
-          ],
-          "backgroundColor": "#4682b4",
-          "paddingTop": "19px",
-          "paddingAll": "12px",
-          "paddingBottom": "16px"
-        },
-        "body": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "・通知温度設定\n・サーバー\n シャットダウン\nができます",
-              "size": "xs",
-              "wrap": true
-            }
-          ],
-          "spacing": "md",
-          "paddingAll": "12px"
-        },
-        "footer": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "separator"
-            },
-            {
-              "type": "button",
-              "action": {
-                "type": "message",
-                "label": "選択する",
-                "text": "for-admin.set-system_config"
-              }
-            }
-          ]
-        },
-        "styles": {
-          "footer": {
-            "separator": false
           }
-        }
+        ]
       },
-      {
-        "type": "bubble",
-        "size": "nano",
-        "header": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "合言葉確認",
-              "color": "#ffffff",
-              "align": "center",
-              "size": "md",
-              "gravity": "center",
-              "wrap": true
-            }
-          ],
-          "backgroundColor": "#A17DF5",
-          "paddingTop": "19px",
-          "paddingAll": "12px",
-          "paddingBottom": "16px"
-        },
-        "body": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "他の人を招待するときだけ押してね",
-              "size": "xs",
-              "wrap": true
-            }
-          ],
-          "spacing": "md",
-          "paddingAll": "12px"
-        },
+      "styles": {
         "footer": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "separator"
-            },
-            {
-              "type": "button",
-              "action": {
-                "type": "message",
-                "label": "確認する",
-                "text": "合言葉が何だったか教えて"
-              }
-            }
-          ]
-        },
-        "styles": {
-          "footer": {
-            "separator": false
-          }
-        }
-      },
-      {
-        "type": "bubble",
-        "size": "nano",
-        "header": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "認証情報削除",
-              "color": "#ffffff",
-              "align": "center",
-              "size": "md",
-              "gravity": "center",
-              "wrap": true
-            }
-          ],
-          "backgroundColor": "#FF6B6E",
-          "paddingTop": "19px",
-          "paddingAll": "12px",
-          "paddingBottom": "16px"
-        },
-        "body": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "ユーザー認証前の状態に戻すよ\n(全ての機能が使えなくなります)",
-              "size": "xs",
-              "wrap": true
-            }
-          ],
-          "spacing": "md",
-          "paddingAll": "12px"
-        },
-        "footer": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "separator"
-            },
-            {
-              "type": "button",
-              "action": {
-                "type": "message",
-                "label": "削除する",
-                "text": "私のユーザー認証情報を削除して"
-              }
-            }
-          ]
-        },
-        "styles": {
-          "footer": {
-            "separator": false
-          }
-        }
-      },
-      {
-        "type": "bubble",
-        "size": "nano",
-        "header": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "管理者ログイン",
-              "color": "#ffffff",
-              "align": "center",
-              "size": "sm",
-              "gravity": "center",
-              "wrap": true
-            }
-          ],
-          "backgroundColor": "#aaaaaa",
-          "paddingTop": "19px",
-          "paddingAll": "12px",
-          "paddingBottom": "16px"
-        },
-        "body": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "【管理者専用】\nadminパスワードが必要です",
-              "size": "xs",
-              "wrap": true
-            }
-          ],
-          "spacing": "md",
-          "paddingAll": "12px"
-        },
-        "footer": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "separator"
-            },
-            {
-              "type": "button",
-              "action": {
-                "type": "message",
-                "label": "ログイン",
-                "text": "login-as-admin"
-              }
-            }
-          ]
-        },
-        "styles": {
-          "footer": {
-            "separator": false
-          }
+          "separator": false
         }
       }
-    ]
-  }
+    },
+    {
+      "type": "bubble",
+      "size": "nano",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "ユーザー招待",
+            "color": "#ffffff",
+            "align": "center",
+            "size": "md",
+            "gravity": "center",
+            "wrap": true
+          }
+        ],
+        "backgroundColor": "#f4a460",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "16px"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "新しく使う人のために合言葉を発行するよ",
+            "size": "xs",
+            "wrap": true
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px"
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "separator"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "message",
+              "label": "発行する",
+              "text": "新しいユーザーを招待"
+            }
+          }
+        ]
+      },
+      "styles": {
+        "footer": {
+          "separator": false
+        }
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "nano",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "電源を切る",
+            "color": "#ffffff",
+            "align": "center",
+            "size": "md",
+            "gravity": "center",
+            "wrap": true
+          }
+        ],
+        "backgroundColor": "#FF6B6E",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "16px"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "サーバーを\nシャットダウンするよ\n（15秒くらい待ってね🙏）",
+            "size": "xs",
+            "wrap": true
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px"
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "separator"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "message",
+              "label": "電源オフ",
+              "text": "私のユーザー認証情報を削除して"
+            }
+          }
+        ]
+      },
+      "styles": {
+        "footer": {
+          "separator": false
+        }
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "nano",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "サーバー情報",
+            "color": "#ffffff",
+            "align": "center",
+            "size": "md",
+            "gravity": "center",
+            "wrap": true
+          }
+        ],
+        "backgroundColor": "#4682b4",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "16px"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "今月の送信可能\nメッセージ数や\nサーバーの情報を表示するよ",
+            "size": "xs",
+            "wrap": true
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px"
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "separator"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "message",
+              "label": "表示する",
+              "text": "サーバーの情報を表示して"
+            }
+          }
+        ]
+      },
+      "styles": {
+        "footer": {
+          "separator": false
+        }
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "nano",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "ユーザー管理",
+            "color": "#ffffff",
+            "align": "center",
+            "size": "md",
+            "gravity": "center",
+            "wrap": true
+          }
+        ],
+        "backgroundColor": "#A17DF5",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "16px"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "ログイン中のユーザーを管理するよ\n（ユーザーの人は管理者にお願いしてね🙇）",
+            "size": "xs",
+            "wrap": true
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px"
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "separator"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "message",
+              "label": "管理画面",
+              "text": "ログインユーザーの一覧を表示して"
+            }
+          }
+        ]
+      },
+      "styles": {
+        "footer": {
+          "separator": false
+        }
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "nano",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "ログアウト",
+            "color": "#ffffff",
+            "align": "center",
+            "size": "sm",
+            "gravity": "center",
+            "wrap": true
+          }
+        ],
+        "backgroundColor": "#aaaaaa",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "16px"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "ログアウトして情報を消すよ\n（機能を使うにはもう一度ユーザー認証が必要です）",
+            "size": "xs",
+            "wrap": true
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px"
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "separator"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "message",
+              "label": "削除する",
+              "text": "ログアウトして私の情報を消して"
+            }
+          }
+        ]
+      },
+      "styles": {
+        "footer": {
+          "separator": false
+        }
+      }
+    }
+  ]
+}

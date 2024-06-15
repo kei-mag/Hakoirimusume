@@ -18,7 +18,7 @@ class HakoirimusumePropertiesTests {
     void loadTest() {
         log.info("loadTest");
         log.info("hakoirimusume.database-path: {}", properties.getDatabasePath());
-        var sensorComponent = properties.getSensorComponent();
+        var sensorComponent = properties.getSensorServer();
         log.info("hakoirimusume.sensorComponent.host: {}", sensorComponent.getHost());
         log.info("hakoirimusume.sensorComponent.port: {}", sensorComponent.getPort());
         var alert = properties.getAlert();

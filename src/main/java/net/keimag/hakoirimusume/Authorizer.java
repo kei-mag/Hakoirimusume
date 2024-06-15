@@ -2,6 +2,7 @@ package net.keimag.hakoirimusume;
 
 import io.micrometer.common.util.StringUtils;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -17,11 +18,13 @@ public class Authorizer {
     private String generationUser = null;
     private Calendar expirationPeriod = null;
 
-    public Authorizer(HakoirimusumeProperties.AikotobaProperties aikotobaProperties) {
-        this.aikotobaProperties = aikotobaProperties;
+    @Autowired
+    public Authorizer(HakoirimusumeProperties hakoirimusumeProperties) {
+        this.aikotobaProperties = hakoirimusumeProperties.getAikotoba();
     }
 
     public String generateNewAikotoba(String generationUser) {
+        log.info("Seeds: {}", aikotobaProperties.getSeeds());
         invalidateAikotoba();
         if (!StringUtils.isBlank(this.generationUser) && !this.generationUser.equals(generationUser)) {
             /* User cannot generate new aikotoba while the aikotoba another user generated is valid. */

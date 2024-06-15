@@ -19,7 +19,7 @@ class AuthorizerTests {
 
     @Test
     void authorizeTest() {
-        Authorizer authorizer = new Authorizer(properties.getAikotoba());
+        Authorizer authorizer = new Authorizer(properties);
         assertThat(authorizer.authorize("aikotoba")).isFalse();
         String aikotoba = authorizer.generateNewAikotoba("test1");
         assertThat(authorizer.authorize(aikotoba)).isTrue();

@@ -18,6 +18,7 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.projectlombok:lombok:1.18.30")
 	annotationProcessor("org.projectlombok:lombok:1.18.30")
@@ -43,11 +44,14 @@ dependencies {
 	implementation("com.linecorp.bot:line-bot-spring-boot-web:8.6.0") // You don't need to depend on this explicitly.
 
 	// for HTTP Request
-	implementation("com.squareup.okhttp3:okhttp:4.12.0")
+//	implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
 	// for SQLite3 Support
-//	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-	implementation("org.komamitsu:spring-data-sqlite:1.0.0")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.hibernate.orm:hibernate-community-dialects:6.1.7.Final")
+	implementation("org.xerial:sqlite-jdbc:3.46.0.0")
+//	implementation("com.devskiller.jpa2ddl:jpa2ddl:0.10.0")
+//	implementation("org.springframework.data.jdbc.core.mapping")
 
 	// for general testing
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

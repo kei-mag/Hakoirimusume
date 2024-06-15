@@ -3,27 +3,34 @@ package net.keimag.hakoirimusume;
 import com.linecorp.bot.messaging.model.FlexMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Supplier;
 
+@Component
 public class RabbitsHouseReportSupplier implements Supplier<FlexMessage> {
     private static final Logger log = LoggerFactory.getLogger(RabbitsHouseReportSupplier.class);
+    private static final String templateJsonPath =  "src/main/resources/templates/report_template.json";
 
-    private final String templateJson;
+    private final String templateJson = Files.readString(Paths.get(templateJsonPath));
+    private final SensorService sensorService;
     private final Calendar c = Calendar.getInstance();
     private final SimpleDateFormat uiDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private final SimpleDateFormat numericDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     private final DecimalFormat df = new DecimalFormat("0.0");
 
-    public RabbitsHouseReportSupplier(String templateJsonPath) throws IOException {
-        this.templateJson = Files.readString(Path.of(templateJsonPath));
+    @Autowired
+    public RabbitsHouseReportSupplier(SensorService sensorService) throws IOException {
+        this.sensorService = sensorService;
     }
 
     private String getMessage(double temp, double hum, double pressure) {
@@ -77,21 +84,25 @@ public class RabbitsHouseReportSupplier implements Supplier<FlexMessage> {
     private String getReportJson() throws IOException, InterruptedException {
         String reportJson = templateJson;
         String temp = "---", humidity = "---", pressure = "---";
-//        if (bme280Data != null) {
-//            temp = df.format(bme280Data.temperature);
-//            humidity = df.format(bme280Data.humidity);
-//            pressure = df.format(bme280Data.pressure / 100);  // 1 Pa = 0.01 hPa
-//            if (bme280Data.temperature >= 27.0 || (bme280Data.temperature >= 26.0 && bme280Data.humidity > 60)) {
-//                reportJson = reportJson.replace("#FFFFFF", "#DC3545");  // Red frame border
-//            }
-//        }
+        var data = sensorService.getSensorCameraData();
+        String message = "今はこんな感じです！";
         String imageUri = null;
+        if (data != null) {
+            temp = df.format(data.temperature());
+            humidity = df.format(data.humidity());
+            pressure = df.format(data.pressure());
+            imageUri = data.cameraUrl();
+            if (data.temperature() >= 27.0 || (data.temperature() >= 26.0 && data.humidity() > 60)) {
+                reportJson = reportJson.replace("#FFFFFF", "#DC3545");  // Red frame border
+            }
+            message = getMessage(data.temperature(), data.humidity(), data.pressure());
+        }
         Date currentTime = c.getTime();
         reportJson = reportJson.replace("{{CurrentTime}}", uiDateFormat.format(currentTime));
         reportJson = reportJson.replace("{{Temperature}}", temp);
         reportJson = reportJson.replace("{{Humidity}}", humidity);
         reportJson = reportJson.replace("{{Pressure}}", pressure);
-//        reportJson = reportJson.replace("{{Message}}");
+        reportJson = reportJson.replace("{{Message}}", message);
         if (imageUri != null) {
             reportJson = reportJson.replace("https://i.imgur.com/Z5GS685.jpeg", imageUri);
         } else {
