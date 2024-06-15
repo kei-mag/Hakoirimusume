@@ -1,0 +1,10 @@
+[Unit]
+Description=Hakoirimusume Sensor & Camera Server
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python /home/keimg/hakoirimusume_sensor/main.py
+
+[Install]
+WantedBy=multi-user.target
