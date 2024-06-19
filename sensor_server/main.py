@@ -30,9 +30,13 @@ index_html = """
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-<title>Dashboard is unavailable</title>
+<title>Hakoirimusume Sensor Server</title>
 <body>
-<h1>Sensor Dashboard is not currently available</h1>
+<h1>Dashboard is unavailable</h1>
+<p>Sensor Dashboard is not currently available</p>
+<p>Please check the status of server applications.</p>
+</body>
+</html>
 """
 camera = None
 bme280 = None
