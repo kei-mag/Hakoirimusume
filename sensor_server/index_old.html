@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <title>うさぎ小屋温度計</title>
+    <meta http-equiv="Refresh" content="10">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+    <style type="text/css">
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #ffffff;
+            font-family: "Comfortaa", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 700;
+            font-style: bold;
+            font-size: 1em;
+            /* 基本フォントサイズ */
+        }
+
+        .header,
+        .footer {
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            font-size: 1.5em;
+            /* bodyのフォントサイズの1.5倍 */
+        }
+
+        .columns {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 40px;
+            flex-wrap: nowrap;
+            /* 横並びを維持 */
+            /* overflow-x: auto; */
+            /* オーバーフローを防ぐ */
+            display: -webkit-box;
+            -webkit-box-orient: horizontal;
+            -webkit-line-clamp: 3;
+            /* display: -ms-flexbox; */
+            -ms-flex-pack: distribute;
+        }
+
+        .column {
+            text-align: center;
+            font-size: 1.5em;
+            /* bodyのフォントサイズの1.5倍 */
+            /* min-width: 100px; */
+            /* 最小幅を設定してオーバーフローを防ぐ */
+            box-sizing: border-box;
+            /* パディングとボーダーを含めてサイズを計算 */
+        }
+
+        .value {
+            font-size: 2em;
+            /* bodyのフォントサイズの2倍 */
+        }
+
+        .unit {
+            font-size: 1em;
+            /* bodyのフォントサイズ */
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+        }
+
+        .button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            font-size: 1em;
+            /* bodyのフォントサイズ */
+            cursor: pointer;
+        }
+
+        .button img {
+            width: 50px;
+            height: 50px;
+        }
+
+        @media (max-width: 1200px) {
+            .columns {
+                justify-content: flex-center;
+                /* 小さい画面で左揃え */
+            }
+
+            .column {
+                flex: 0 0 auto;
+                /* 最小幅を保つ */
+            }
+        }
+    </style>
+    <script>
+        function shutdown() {
+            fetch('/shutdown', {
+                method: 'POST'
+            }).then(() => {
+                alert('サーバーをシャットダウンします\n\nシャットダウンには10秒ほどかかります。\n本体のLEDが消灯するまで電源コードを抜かないでください。');
+                location.reload();
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="header">
+        <div>Last Update : {{DATETIME}}</div>
+    </div>
+    <div class="columns">
+        <div class="column">
+            <div>Temperature</div>
+            <div class="value">{{TEMP}}</div>
+            <div class="unit">°C</div>
+        </div>
+        <div class="column">
+            <div>Humidity</div>
+            <div class="value">{{HUMID}}</div>
+            <div class="unit">%</div>
+        </div>
+        <div class="column">
+            <div>Pressure</div>
+            <div class="value">{{PRESS}}</div>
+            <div class="unit">hPa</div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="button-container">
+            <div class="button" onclick="location.reload();">
+                <img src="https://icooon-mono.com/i/icon_11972/icon_119721_512.png" alt="Update">
+                <div>Update</div>
+            </div>
+            <div class="button" onclick="shutdown();">
+                <img src="https://icooon-mono.com/i/icon_00204/icon_002041_512.png" alt="Shutdown">
+                <div>Shutdown</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
