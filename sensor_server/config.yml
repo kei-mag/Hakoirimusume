@@ -18,7 +18,7 @@ imgur.client-id: ${IMGUR_CLIENT_ID}
 hardware:
   pi-camera: yes  # If false, image area of Rabbit's House Report will be disappeared.
   bme280.i2c-bus: 1
-  bme280.i2c-address: 0x77
+  bme280.i2c-address: 0x76
 
 # Generative filepaths
 filepath.sensor-data: "./sensor-data.csv"

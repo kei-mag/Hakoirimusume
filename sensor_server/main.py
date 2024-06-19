@@ -15,7 +15,7 @@ CONFIG_FILE = "./config.yml"
 INDEX_HTML_FILE = "./index.html"
 RELOAD_INTERVAL = 300  # sec.
 ACCEPT_ADDR = "0.0.0.0"
-ENV_VAL_FORM = re.compile(r"${(.+)}")
+ENV_VAL_FORM = re.compile(r"\${(.+)}")
 
 # ----- Default config values -----
 port = 80
@@ -47,7 +47,7 @@ def main():
     print(f"Working directory: {os.getcwd}")
     print(f"Loaded config file: {os.path.abspath(CONFIG_FILE)}")
     print(f"Listening PORT: {port}")
-    print(f"Imgur Client ID: {imgur_client_id}")  # *** (Not be shown for security)")
+    print("Imgur Client ID: *** (Not be shown for security)")
     print(f"Enable Camera: {enable_camera}")
     print(f"BME280 I2C-BUS: {i2c_bus}")
     print(f"BME280 I2C-ADDR: 0x{i2c_addr:x}")
@@ -71,27 +71,32 @@ def main():
 def load_config():
     global port, imgur_client_id, enable_camera, i2c_bus, i2c_addr, sensor_data_file
     config = yaml.safe_load(open(CONFIG_FILE))
-    print(config)
-    if "server" in config:
-        port = replace_env(config["server"].get("port", port))
-    if "imgur" in config:
-        imgur_client_id = replace_env(config["imgur"].get("client-id", imgur_client_id))
+    port = replace_env(config.get("server.port", port))
+    imgur_client_id = replace_env(config.get("imgur.client-id", imgur_client_id))
+    # if "server" in config:
+    #     port = replace_env(config["server"].get("port", port))
+    # if "imgur" in config:
+    #     imgur_client_id = replace_env(config["imgur"].get("client-id", imgur_client_id))
     if "hardware" in config:
         hardware_config = config["hardware"]
         enable_camera = hardware_config.get("pi-camera", enable_camera)
-        if "bme280" in hardware_config:
-            i2c_bus = replace_env(hardware_config["bme280"].get("i2c-bus", i2c_bus))
-            i2c_addr = replace_env(hardware_config["bme280"].get("i2c-address", i2c_addr))
-        if "filepath" in config:
-            sensor_data_file = replace_env(config["filepath"].get("sensor-data", sensor_data_file))
+        i2c_bus = hardware_config.get("bme280.i2c-bus", i2c_bus)
+        i2c_addr = hardware_config.get("bme280.i2c-address", i2c_addr)
+    #     if "bme280" in hardware_config:
+    #         i2c_bus = replace_env(hardware_config["bme280"].get("i2c-bus", i2c_bus))
+    #         i2c_addr = replace_env(hardware_config["bme280"].get("i2c-address", i2c_addr))
+    #     if "filepath" in config:
+    #         sensor_data_file = replace_env(config["filepath"].get("sensor-data", sensor_data_file))
+    sensor_data_file = replace_env(config.get("filepath.sensor-data", sensor_data_file))
 
 
 def replace_env(value):
-    match = ENV_VAL_FORM.search(value)
-    if match:
-        return ENV_VAL_FORM.sub(os.getenv(match.group(1), ""), value)
-    else:
-        return value
+    if isinstance(value, str):
+        match = ENV_VAL_FORM.search(value)
+        print(value, match)
+        if match:
+            return ENV_VAL_FORM.sub(os.getenv(match.group(1), ""), value)
+    return value
 
 
 class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
