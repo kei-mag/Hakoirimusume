@@ -8,12 +8,9 @@ from urllib.parse import parse_qs, urlparse
 import imgur
 import yaml
 
-# from bme280 import BME280
-# from picamera import PiCamera
-
 CONFIG_FILE = "./config.yml"
 INDEX_HTML_FILE = "./index.html"
-RELOAD_INTERVAL = 300  # sec.
+RELOAD_INTERVAL = 600  # sec.
 ACCEPT_ADDR = "0.0.0.0"
 ENV_VAL_FORM = re.compile(r"\${(.+)}")
 
@@ -45,7 +42,7 @@ bme280 = None
 def main():
     global camera, bme280, index_html
     os.chdir(os.path.dirname(__file__))
-    print("HTTP SERVER for Rabbit's House Report")
+    print("Hakoirimusume Sensor Server")
     load_config()
     print("----- Running Info -----")
     print(f"Working directory: {os.getcwd}")
@@ -57,9 +54,17 @@ def main():
     print(f"BME280 I2C-ADDR: 0x{i2c_addr:x}")
     print(f"Sensor Data File: {os.path.abspath(sensor_data_file)}")
     print("------------------------")
-    # bme280 = BME280(i2c_bus, i2c_addr)
-    # if enable_camera:
-    #     camera = PiCamera()
+    try:
+        from bme280 import BME280
+        bme280 = BME280(i2c_bus, i2c_addr)
+    except Exception as e:
+        print("Error has occurred while initializing BME280. Continue without BME 280: ", e)
+    if enable_camera:
+        try:
+            from picamera import PiCamera
+            camera = PiCamera()
+        except Exception as e:
+            print("Error has occurred while initializing PiCamera. Continue without PiCamera: ", e)
     with open(INDEX_HTML_FILE, "r", encoding="UTF-8") as file:
         index_html = file.read()
         index_html = index_html.replace("{{INTERVAL}}", str(RELOAD_INTERVAL))
@@ -97,7 +102,6 @@ def load_config():
 def replace_env(value):
     if isinstance(value, str):
         match = ENV_VAL_FORM.search(value)
-        print(value, match)
         if match:
             return ENV_VAL_FORM.sub(os.getenv(match.group(1), ""), value)
     return value

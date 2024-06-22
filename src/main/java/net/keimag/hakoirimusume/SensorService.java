@@ -23,11 +23,11 @@ public class SensorService {
     }
 
     public SensorData getSensorData() {
-        return getData(sensorServerProperties.getNoCameraEndpoint());
+        return getData(sensorServerProperties.getEndpoint());
     }
 
     public SensorData getSensorCameraData() {
-        return getData(sensorServerProperties.getEndpoint());
+        return getData(sensorServerProperties.getCameraEndpoint());
     }
 
     private SensorData getData(String endpoint) {

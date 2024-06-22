@@ -36,7 +36,7 @@ public class HakoirimusumeProperties {
         @URL(protocol = "http")
         private String endpoint = "localhost";
         @URL(protocol = "http")
-        private String noCameraEndpoint = "localhost?noCamera=true";
+        private String cameraEndpoint = "localhost?noCamera=true";
     }
 
     @Data

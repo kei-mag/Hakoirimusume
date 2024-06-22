@@ -26,8 +26,8 @@ hakoirimusume:
     for-authorized-user: richmenu-926d8a458c54f8efbca72b268a485a46  # Rich menu ID for authorized user
   sensor-server:
     # Configure sensor component, see also: README.md
-    endpoint: http://Test-Pi.local/ # Endpoint for sensor data & camera image
-    no-camera-endpoint : http://localhost/get?nocamera  # Endpoint for no camera image
+    endpoint: http://localhost/get # Endpoint for sensor data & camera image
+    camera-endpoint : http://localhost/get?withcamera  # Endpoint for no camera image
   alert:
     to: [ # LINE user / group ID list to send alert
 #      "Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",

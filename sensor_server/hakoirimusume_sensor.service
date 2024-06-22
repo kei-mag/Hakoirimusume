@@ -1,10 +1,14 @@
 [Unit]
 Description=Hakoirimusume Sensor & Camera Server
 After=network-online.target
+StartLimitAction=reboot
+StartLimitIntervalSec=120
+StartLimitBurst=8
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python /home/keimg/hakoirimusume_sensor/main.py
+WorkingDirectory=/home/keimag/Hakoirimusume/sensor_server
+ExecStart=/home/keimag/Hakoirimusume/sensor_server/.venv/bin/python3 /home/keimag/Hakoirimusume/sensor_server/main.py
 
 [Install]
 WantedBy=multi-user.target
