@@ -17,10 +17,6 @@ class HakoirimusumePropertiesTests {
     @Test
     void loadTest() {
         log.info("loadTest");
-        log.info("hakoirimusume.database-path: {}", properties.getDatabasePath());
-        var sensorComponent = properties.getSensorServer();
-        log.info("hakoirimusume.sensorComponent.host: {}", sensorComponent.getHost());
-        log.info("hakoirimusume.sensorComponent.port: {}", sensorComponent.getPort());
         var alert = properties.getAlert();
         var triggerLimit = alert.getTriggerLimit();
         log.info("hakoirimusume.alert.trigger-limit.interval: {}", triggerLimit.getInterval());

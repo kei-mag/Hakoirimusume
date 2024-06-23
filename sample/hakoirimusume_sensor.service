@@ -1,0 +1,18 @@
+# Hakoirimusume Sensor Server Systemd Daemon
+[Unit]
+Description=Hakoirimusume Sensor & Camera Server
+After=network-online.target
+StartLimitAction=reboot
+StartLimitIntervalSec=120
+StartLimitBurst=8
+
+[Service]
+Type=simple
+# TODO: Change the following path to the actual install directory
+WorkingDirectory=/path/to/install/directory
+ExecStart=/usr/bin/python3 /path/to/install/directory/sensor_server/main.py
+TimeoutStopSec=10
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

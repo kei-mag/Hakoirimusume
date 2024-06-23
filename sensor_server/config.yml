@@ -1,0 +1,21 @@
+# ################################################## #
+# Configuration file for Hakoirimusume Sensor Server #
+# ################################################## #
+# ${VAR_NAME} will be replaced with the value of the environment variable VAR_NAME.
+# See docs/configuration.md for more information.
+
+# Server
+server.port: 80
+
+
+# Imgur API 
+imgur.client-id: ${IMGUR_CLIENT_ID}
+
+# PiCamera & Sensor
+hardware:
+  pi-camera: yes  # If false, Camera image will not be provided even if PiCamera is connected.
+  bme280.i2c-bus: 1
+  bme280.i2c-address: 0x76
+
+# Generative filepaths
+filepath.sensor-data: "./sensor-data.csv"

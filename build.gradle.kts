@@ -1,15 +1,21 @@
-
 plugins {
 	java
-	id("org.springframework.boot") version "3.2.5"
-	id("io.spring.dependency-management") version "1.1.4"
+	id("org.springframework.boot") version "3.3.1"
+	id("io.spring.dependency-management") version "1.1.5"
+	id("io.freefair.lombok") version "8.6"
 }
 
 group = "net.keimag"
-version = "0.0.1-SNAPSHOT"
+version = "2.0.0-SNAPSHOT"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_17
+}
+
+configurations {
+	compileOnly {
+		extendsFrom(configurations.annotationProcessor.get())
+	}
 }
 
 repositories {
@@ -17,44 +23,19 @@ repositories {
 }
 
 dependencies {
+	implementation("org.hibernate.orm:hibernate-community-dialects:6.1.7.Final")
+	implementation("com.linecorp.bot:line-bot-messaging-api-client:8.6.0")
+	implementation("com.linecorp.bot:line-channel-access-token-client:8.6.0")
+	implementation("com.linecorp.bot:line-bot-webhook:8.6.0")
+	implementation("com.linecorp.bot:line-bot-spring-boot-handler:8.6.0")
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("org.projectlombok:lombok:1.18.30")
-	annotationProcessor("org.projectlombok:lombok:1.18.30")
-	testCompileOnly("org.projectlombok:lombok:1.18.30")
-	testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
-	compileOnly("org.springframework.boot:spring-boot-configuration-processor") // for adding custom configuration to application.yml
-	testCompileOnly("org.springframework.boot:spring-boot-configuration-processor") // for adding custom configuration to application.yml
-
-	// LINE Bot SDK
-	implementation("com.linecorp.bot:line-bot-messaging-api-client:8.6.0")
-	implementation("com.linecorp.bot:line-bot-insight-client:8.6.0")
-	implementation("com.linecorp.bot:line-bot-manage-audience-client:8.6.0")
-	implementation("com.linecorp.bot:line-bot-module-attach-client:8.6.0")
-	implementation("com.linecorp.bot:line-bot-module-client:8.6.0")
-	implementation("com.linecorp.bot:line-bot-shop-client:8.6.0")
-	implementation("com.linecorp.bot:line-channel-access-token-client:8.6.0")
-	implementation("com.linecorp.bot:line-liff-client:8.6.0")
-	implementation("com.linecorp.bot:line-bot-webhook:8.6.0")
-	implementation("com.linecorp.bot:line-bot-parser:8.6.0") // You don't need to depend on this explicitly.
-	implementation("com.linecorp.bot:line-bot-spring-boot-webmvc:8.6.0")
-	implementation("com.linecorp.bot:line-bot-spring-boot-client:8.6.0") // If you want to write spring-boot API client
-	implementation("com.linecorp.bot:line-bot-spring-boot-handler:8.6.0") // You don't need to depend on this explicitly.
-	implementation("com.linecorp.bot:line-bot-spring-boot-web:8.6.0") // You don't need to depend on this explicitly.
-
-	// for HTTP Request
-//	implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
-	// for SQLite3 Support
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.hibernate.orm:hibernate-community-dialects:6.1.7.Final")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.xerial:sqlite-jdbc:3.46.0.0")
-//	implementation("com.devskiller.jpa2ddl:jpa2ddl:0.10.0")
-//	implementation("org.springframework.data.jdbc.core.mapping")
-
-	// for general testing
+	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<Test> {

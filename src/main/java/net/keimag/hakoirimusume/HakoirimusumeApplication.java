@@ -48,13 +48,13 @@ public class HakoirimusumeApplication {
     }
 
 	@EventMapping
-	public void handleTextMessageEvent(MessageEvent event) throws IOException, InterruptedException {
+	public void handleTextMessageEvent(MessageEvent event) {
 		log.info("event: {}", event);
 		final String originalMessageText = ((TextMessageContent) event.message()).text();
 		switch (originalMessageText) {
 			case "ユーザー認証":
 				if (userService.getRole(event.source().userId()) != null && userService.getRole(event.source().userId()) >= UserService.USER) {
-					this.reply(event.replyToken(), List.of(new TextMessage("もう既にユーザーとして登録されてるよ！何か困ったことがあったら管理者に訊いてみてね🙇")), false);;
+					this.reply(event.replyToken(), List.of(new TextMessage("もう既にユーザーとして登録されてるよ！何か困ったことがあったら管理者に訊いてみてね🙇")), false);
 				} else {
 					userService.addUser(event.source().userId());
 					userService.setState(event.source().userId(), UserState.WAIT_FOR_AIKOTOBA.ordinal());
@@ -72,13 +72,13 @@ public class HakoirimusumeApplication {
 				log.info("Replied.");
 				break;
 			case "げんき？":
-				doForUser(event.source().userId(), () -> {
+				doForUser(event.source().userId(), event.replyToken(), () -> {
 					messagingApiClient.showLoadingAnimation(new ShowLoadingAnimationRequest(event.source().userId(), 30));
 					this.reply(event.replyToken(), List.of(rabbitsHouseReportSupplier.get()), false);
 				});
 				break;
 			case "メニューをひらいて":
-				doForUser(event.source().userId(), () -> {
+				doForUser(event.source().userId(), event.replyToken(), () -> {
 					this.reply(event.replyToken(), List.of(new FlexMessageBuilder().build("MENU", this.menuJson)), false);
 				});
 				break;
@@ -120,11 +120,11 @@ public class HakoirimusumeApplication {
 		}
 	}
 
-	private void doForUser(String userId, Runnable action) {
+	private void doForUser(String userId, String replyToken, Runnable action) {
 		if (userService.isSatisfiedRole(userId, UserService.USER)) {
 			action.run();
 		} else {
-			this.reply(userId, List.of(new TextMessage("箱入り娘の機能を使うには最初にユーザー認証が必要です。\n使っている人に合言葉を教えてもらってから\n「ユーザー認証」\nと言ってみてね！🙏")), false);
+			this.reply(replyToken, List.of(new TextMessage("箱入り娘の機能を使うには最初にユーザー認証が必要です。\n使っている人に合言葉を教えてもらってから\n「ユーザー認証」\nと言ってみてね！🙏")), false);
 		}
 	}
 

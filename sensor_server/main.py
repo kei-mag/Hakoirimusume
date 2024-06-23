@@ -9,7 +9,7 @@ import imgur
 import yaml
 
 CONFIG_FILE = "./config.yml"
-INDEX_HTML_FILE = "./index.html"
+INDEX_HTML_FILE = "templates/index.html"
 RELOAD_INTERVAL = 600  # sec.
 ACCEPT_ADDR = "0.0.0.0"
 ENV_VAL_FORM = re.compile(r"\${(.+)}")

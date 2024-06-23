@@ -1,0 +1,19 @@
+# Hakoirimusume LINE BOT Server Systemd Daemon
+[Unit]
+Description=Hakoirimusume LINE BOT Server
+After=network-online.target
+StartLimitAction=reboot
+StartLimitIntervalSec=120
+StartLimitBurst=8
+
+[Service]
+Type=simple
+# TODO: Change the following path to the actual install directory
+WorkingDirectory=/path/to/install/directory
+ExecStart=/path/to/install/directory/Hakoirimusume-X.X.X.jar
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
