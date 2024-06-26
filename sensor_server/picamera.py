@@ -1,6 +1,5 @@
 from io import BytesIO
 from picamera2 import Picamera2
-from libcamera import Transform
 
 
 class PiCamera:

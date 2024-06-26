@@ -1,0 +1,41 @@
+<!------------ index.html テンプレートファイル ------------>
+<!-- {{COMMAND_LIST}} がcodes.jsonの内容に置き換えられる -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemotePy Server</title>
+    <style>
+        .note {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .warning {
+            background-color: #fff4d7;
+            color: #8a6d3b;
+        }
+        .note-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Raspberry Pi Pico Wi-Fiリモコン</h1>
+    Wi-Fi経由で家電を操作することができます。
+    <p>セキュリティリスク回避のため、このページは家庭内のWi-Fiからのみアクセスできます。</p>
+    <div class="note warning">
+        <span class="note-icon">⚠️</span>
+        <div>
+            <strong>注意</strong><br>
+            赤外線の送信に成功しても、その赤外線が届いたとは限りません。<br>
+            確実に赤外線が届くようにRaspberry Pi Pico Wの置き場所には十分注意し、送信部を覆わないようにしてください。
+        </div>
+    </div>
+    <h2>コマンドリスト</h2>
+    {{COMMAND_LIST}}
+</html>

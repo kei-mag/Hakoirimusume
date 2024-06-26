@@ -6,10 +6,11 @@ import re
 from urllib.parse import parse_qs, urlparse
 
 import imgur
-import yaml
+from ruamel.yaml import YAML
 
 CONFIG_FILE = "./config.yml"
-INDEX_HTML_FILE = "templates/index.html"
+DASHBOARD_HTML_FILE = "templates/dashboard.html"
+SHUTTING_DOWN_HTML_FILE = "templates/shutting_down.html"
 RELOAD_INTERVAL = 600  # sec.
 ACCEPT_ADDR = "0.0.0.0"
 ENV_VAL_FORM = re.compile(r"\${(.+)}")
@@ -23,7 +24,7 @@ i2c_addr = 0x76
 sensor_data_file = "./sensor_data.csv"
 # ---------------------------------
 
-index_html = """
+dashboard_html = """
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
@@ -35,12 +36,27 @@ index_html = """
 </body>
 </html>
 """
+shutting_down_html = """
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta http-equiv="refresh" content="10;URL=/">
+    <meta charset="UTF-8">
+    <title>シャットダウン中</title>
+</head>
+<body>
+        <h1>サーバーをシャットダウンしています</h1>
+                <p>シャットダウンには30秒ほどかかります。本体のLEDが消灯するまで電源コードを抜かないでください。</p>
+                
+            </body>
+            </html>
+"""
 camera = None
 bme280 = None
 
 
 def main():
-    global camera, bme280, index_html
+    global camera, bme280, dashboard_html
     os.chdir(os.path.dirname(__file__))
     print("Hakoirimusume Sensor Server")
     load_config()
@@ -65,9 +81,12 @@ def main():
             camera = PiCamera()
         except Exception as e:
             print("Error has occurred while initializing PiCamera. Continue without PiCamera: ", e)
-    with open(INDEX_HTML_FILE, "r", encoding="UTF-8") as file:
-        index_html = file.read()
-        index_html = index_html.replace("{{INTERVAL}}", str(RELOAD_INTERVAL))
+    try:
+        with open(DASHBOARD_HTML_FILE, "r", encoding="UTF-8") as file:
+            dashboard_html = file.read()
+            dashboard_html = dashboard_html.replace("{{INTERVAL}}", str(RELOAD_INTERVAL))
+    except Exception as e:
+        print("Error has occurred while reading dashboard.html, dashboard is not available: ", e)
     with http.server.HTTPServer((ACCEPT_ADDR, port), CustomHTTPRequestHandler) as httpd:
         print("serving at port", port)
         try:
@@ -79,7 +98,8 @@ def main():
 
 def load_config():
     global port, imgur_client_id, enable_camera, i2c_bus, i2c_addr, sensor_data_file
-    config = yaml.safe_load(open(CONFIG_FILE))
+    yaml=YAML(typ='safe')
+    config = yaml.load(open(CONFIG_FILE))
     port = replace_env(config.get("server.port", port))
     imgur_client_id = replace_env(config.get("imgur.client-id", imgur_client_id))
     # if "server" in config:
@@ -131,12 +151,7 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                     humid = f"{humid:.1f}"
                     press = f"{press:.0f}"
             cur_time = datetime.datetime.now()
-            # TODO: DEBUG
-            with open(INDEX_HTML_FILE, "r", encoding="UTF-8") as file:
-                index_html = file.read()
-                index_html = index_html.replace("{{INTERVAL}}", str(RELOAD_INTERVAL))
-            # TODO: END DEBUG
-            content = index_html
+            content = dashboard_html
             content = content.replace("{{DATETIME}}", cur_time.strftime("%Y/%m/%d %H:%M:%S"))
             content = content.replace("{{TEMP}}", temp)
             content = content.replace("{{HUMID}}", humid)
@@ -150,6 +165,7 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 except Exception as e:
                     print("Failed to get BME280 data: ", e)
             cur_time = datetime.datetime.now()
+            # Calculate offset time without pytz package
             offset = cur_time.replace(tzinfo=datetime.UTC) - datetime.datetime.now(datetime.UTC)
             total_seconds = offset.total_seconds()
             hours, remainder = divmod(total_seconds, 3600)
@@ -190,7 +206,7 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             </head>
             <body>
                 <h1>サーバーをシャットダウンしています</h1>
-                <p>シャットダウンには10秒ほどかかります。本体のLEDが消灯するまで電源コードを抜かないでください。</p>
+                <p>シャットダウンには30秒ほどかかります。本体のLEDが消灯するまで電源コードを抜かないでください。</p>
                 
             </body>
             </html>

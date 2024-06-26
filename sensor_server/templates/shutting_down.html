@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta content="10;URL=/" http-equiv="refresh">
+    <meta content="width=device-width, height=device-height, initial-scale=1.0" name="viewport">
+    <meta charset="UTF-8">
+    <title>シャットダウン中</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 3vw; /* 画面幅に応じてフォントサイズを調整 */
+        }
+
+        img {
+            max-width: 100%;
+            height: auto; /* 高さを自動調整 */
+            max-height: 80vh; /* 画面に収まるように高さを設定 */
+        }
+
+        @media screen and (max-width: 480px) {
+            h1 {
+                font-size: 6vw; /* 画面幅が小さい場合のフォントサイズ調整 */
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>サーバーをシャットダウンしています</h1>
+<p>シャットダウンには10秒ほどかかります。</p>
+<p>本体のLEDが消灯するまで電源コードを抜かないでください。</p>
+<img src="instruction2.jpg" alt="instruction image">
+</body>
+</html>
