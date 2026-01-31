@@ -26,7 +26,6 @@
         }
 
         /* --- Header (14%) --- */
-        /* 12% -> 14% (中間サイズ) */
         .row-head { height: 14%; vertical-align: middle; }
         #header-box {
             width: 100%; height: 100%;
@@ -37,7 +36,7 @@
         /* Connection Icon (Top Left) */
         #conn-status {
             position: absolute; top: 0; left: 0;
-            width: 100px; height: 100%; /* 幅を少し調整 */
+            width: 100px; height: 100%;
             display: table;
             text-align: center;
             z-index: 10;
@@ -48,7 +47,7 @@
         /* Menu Button (Top Right) */
         #menu-btn {
             position: absolute; top: 0; right: 0;
-            width: 100px; height: 100%;
+            width: 120px; height: 100%;
             line-height: 100%;
             font-size: 55px;
             text-align: center;
@@ -58,18 +57,16 @@
         }
         #menu-btn span { display: table-cell; vertical-align: middle; }
 
-        /* Time Display (Center) - 1行で大きく */
+        /* Time Display (Center) */
         #time-table {
             width: 100%; height: 100%;
             border-collapse: collapse;
         }
         #time-cell {
             text-align: center; vertical-align: middle;
-            /* アイコンとメニューの分を避ける */
             padding-left: 80px; padding-right: 80px;
         }
         #time-val {
-            /* 1行に収まる範囲で最大化 */
             font-size: 50px;
             font-weight: 700; color: #000;
             display: block;
@@ -82,9 +79,8 @@
         .stale #menu-btn { background: #000; color: #fff; }
         .stale #time-val { color: #fff; }
 
-        /* --- Main Content (72%) --- */
-        /* 76% -> 72% */
-        .row-main { height: 70%; vertical-align: middle; }
+        /* --- Main Content (70%) --- */
+        .row-main { height: 66%; vertical-align: middle; }
         .val-table {
             width: 100%; height: 100%;
             border-collapse: collapse;
@@ -123,7 +119,7 @@
 
         /* 3. Value (Big) */
         .val-num {
-            font-size: 140px; /* サイズ維持 */
+            font-size: 140px;
             font-weight: 700;
             line-height: 1.0;
             letter-spacing: -6px;
@@ -141,9 +137,8 @@
             line-height: 1.0;
         }
 
-        /* --- Footer (14%) --- */
-        /* 12% -> 14% (中間サイズ) */
-        .row-foot { height: 16%; vertical-align: middle; }
+        /* --- Footer (16%) --- */
+        .row-foot { height: 20%; vertical-align: middle; }
         .btn-table {
             width: 100%; height: 100%;
             border-collapse: collapse;
@@ -171,12 +166,10 @@
         }
 
         .btn-content { display: inline-block; }
-        /* アイコンサイズを少し調整 */
         .btn-img { width: 50px; height: 50px; vertical-align: middle; margin-right: 8px; }
-        /* フォントサイズは維持 */
         .btn-txt { font-size: 50px; font-weight: 700; vertical-align: middle; }
 
-        /* --- Overlays (Unchanged) --- */
+        /* --- Overlays --- */
         .overlay {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
@@ -188,7 +181,8 @@
         /* Menu */
         #menu-view { z-index: 60; }
         .menu-header {
-            height: 80px; border-bottom: 3px solid #000;
+            height: 14%; /* Matched with Main Header (14%) */
+            border-bottom: 3px solid #000;
             text-align: right; vertical-align: middle;
             display: table; width: 100%;
         }
@@ -196,15 +190,17 @@
             display: table-cell; vertical-align: middle;
             padding-right: 20px;
         }
+        /* Common Close Button Style */
         .menu-close { font-size: 40px; font-weight: bold; cursor: pointer; }
-        .menu-content { padding: 40px; text-align: center; }
 
+        .menu-content { padding: 40px; text-align: center; }
         .menu-lbl { font-size: 32px; font-weight: bold; display: block; margin-bottom: 15px; }
         select { font-size: 32px; padding: 15px; width: 100%; border: 3px solid #000; background: #fff; }
 
         .shutdown-btn {
             background: #000; color: #fff; border: none;
-            font-size: 32px; padding: 30px;
+            font-size: 50px; padding: 30px;
+            font-weight: 700;
             font-family: inherit; cursor: pointer; width: 100%;
             margin-top: 60px;
         }
@@ -219,23 +215,43 @@
             width: 100%; height: 100%;
             border-collapse: collapse; table-layout: fixed;
         }
-        .gh-row { height: 20%; vertical-align: middle; }
+        .gh-row { height: 14%; vertical-align: middle; } /* Matched with Main Header (14%) */
         #graph-head-cell { border-bottom: 4px solid #000; padding: 0 10px; }
-        .gb-row { height: 80%; vertical-align: middle; }
+        .gb-row { height: 86%; vertical-align: middle; } /* Remaining height (86%) */
         #graph-body-cell { padding: 0; position: relative; }
 
         .gh-content-table { width: 100%; height: 100%; }
         .gh-left { text-align: left; vertical-align: middle; }
         .gh-right { text-align: right; vertical-align: middle; }
 
+        /* Graph Tabs */
         .g-tab {
-            font-size: 28px; padding: 15px 25px; border: 3px solid #000;
-            margin-right: 10px; cursor: pointer; font-weight: bold;
+            border: 3px solid #000;
+            margin-right: 10px; cursor: pointer;
             display: inline-block;
+            padding: 10px 15px; /* Adjust padding for icon */
+            background: #fff;
+            vertical-align: middle;
         }
         .g-tab.active { background: #000; color: #fff; }
-        .close-btn { font-size: 50px; font-weight: bold; cursor: pointer; }
 
+        /* Icon & Text in Tab */
+        .g-tab-icon {
+            width: 40px; height: 40px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        .g-tab-txt {
+            font-size: 30px; font-weight: bold;
+            vertical-align: middle;
+        }
+        /* Invert icon color when tab is active (Black background) */
+        .g-tab.active .g-tab-icon {
+            filter: invert(1);
+            -webkit-filter: invert(1);
+        }
+
+        /* Canvas */
         #g-cvs { display: block; width: 100%; height: 100%; }
 
         /* Toast */
@@ -277,7 +293,7 @@
                         </div>
                     </div>
 
-                    <!-- Center: Time (1 Line, Big, with Seconds) -->
+                    <!-- Center: Time -->
                     <table id="time-table">
                         <tr>
                             <td id="time-cell">
@@ -336,10 +352,7 @@
                                 <span class="btn-txt">GRAPH</span>
                             </div>
                         </td>
-                        <!-- Separator with margin -->
-                        <td class="btn-sep">
-                            <div class="sep-line"></div>
-                        </td>
+                        <td class="btn-sep"><div class="sep-line"></div></td>
                         <td class="btn-cell" onclick="app.manualUpdate()">
                             <div class="btn-content">
                                 <img src="reload.jpg" class="btn-img">
@@ -385,12 +398,20 @@
                     <table class="gh-content-table">
                         <tr>
                             <td class="gh-left">
-                                <span id="gt-temp" class="g-tab active" onclick="app.drawGraph('temp')">TEMP</span>
-                                <span id="gt-hum" class="g-tab" onclick="app.drawGraph('hum')">HUMID</span>
-                                <span id="gt-pres" class="g-tab" onclick="app.drawGraph('pres')">PRESS</span>
+                                <!-- Tabs with Icons -->
+                                <span id="gt-temp" class="g-tab active" onclick="app.drawGraph('temp')">
+                                    <img src="temp.jpg" class="g-tab-icon"><span class="g-tab-txt">Temp.</span>
+                                </span>
+                                <span id="gt-hum" class="g-tab" onclick="app.drawGraph('hum')">
+                                    <img src="waterdrop.jpg" class="g-tab-icon"><span class="g-tab-txt">Hum.</span>
+                                </span>
+                                <span id="gt-pres" class="g-tab" onclick="app.drawGraph('pres')">
+                                    <img src="wind.jpg" class="g-tab-icon"><span class="g-tab-txt">Press.</span>
+                                </span>
                             </td>
                             <td class="gh-right">
-                                <span class="close-btn" onclick="app.closeGraph()">✖</span>
+                                <!-- Close Button (Matched Style) -->
+                                <span class="menu-close" onclick="app.closeGraph()">✖ CLOSE</span>
                             </td>
                         </tr>
                     </table>
@@ -431,7 +452,6 @@
                 var sel = document.getElementById("set-int");
                 if (sel) sel.value = this.conf.int;
 
-                // Kindle Trailing Comma Warning: Do not leave commas at end of lists/objects
                 setInterval(function() { app.tick(); }, 1000);
                 this.update();
                 this.startTimer();
@@ -445,7 +465,6 @@
             tick: function() {
                 var now = new Date();
                 var ts = now.getTime();
-
                 // Stale check
                 if (this.state.last > 0 && (ts - this.state.last > 1800000)) {
                     document.body.className = "stale";
@@ -462,7 +481,6 @@
             setConnIcon: function(ok) {
                 var img = document.getElementById("conn-img");
                 var target = ok ? "connected.jpg" : "notconnected.jpg";
-                // Only update if src is different to avoid flicker
                 if (img.src.indexOf(target) === -1) {
                     img.src = target;
                 }
@@ -473,7 +491,6 @@
                 var ts = new Date().getTime();
                 xhr.open("GET", "/api/sensor?_=" + ts, true);
 
-                // Timeout handling for connection status
                 xhr.timeout = 10000;
                 xhr.ontimeout = function() {
                     app.toast("Connection Timeout", true);
@@ -517,7 +534,7 @@
                 document.getElementById("v-hum").innerHTML = h;
                 document.getElementById("v-pres").innerHTML = p;
 
-                // Time Update (Only on success)
+                // Time Update
                 var days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
                 var Y = now.getFullYear();
                 var M = ("0"+(now.getMonth()+1)).slice(-2);
@@ -526,9 +543,8 @@
                 var HH = ("0"+now.getHours()).slice(-2);
                 var MM = ("0"+now.getMinutes()).slice(-2);
                 var SS = ("0"+now.getSeconds()).slice(-2);
-
-                // Format: 2026.01.31 SAT 15:27:30
                 var timeStr = Y + "." + M + "." + D + " " + day + " " + HH + ":" + MM + ":" + SS;
+
                 var el = document.getElementById("time-val");
                 if(el) el.innerHTML = timeStr;
 
@@ -566,7 +582,6 @@
             loadGraph: function() {
                 var cvs = document.getElementById("g-cvs");
                 var ctx = cvs.getContext("2d");
-
                 var rect = cvs.parentElement.getBoundingClientRect();
                 cvs.width = rect.width;
                 cvs.height = rect.height;
