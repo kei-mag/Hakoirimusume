@@ -278,7 +278,7 @@
         #msg-cell { text-align: center; vertical-align: middle; }
         #msg-title { font-size: 50px; font-weight: bold; margin-bottom: 30px; }
         #msg-desc { font-size: 26px; margin-bottom: 30px; line-height: 1.4; padding: 0 20px; }
-        #msg-img { max-width: 80%; border: 3px solid #000; margin-bottom: 30px; }
+        #msg-img { max-width: 80%; border: none; margin-bottom: 30px; }
         .reconnect-btn {
             font-size: 30px; padding: 20px 40px;
             border: 3px solid #000; background: #fff;
@@ -594,6 +594,15 @@
             },
 
             toast: function(msg, stick) {
+                var msgView = document.getElementById("msg-view");
+                var confView = document.getElementById("confirm-view");
+
+                var isMsgVisible = (msgView && msgView.className.indexOf("active") >= 0);
+                var isConfVisible = (confView && confView.className.indexOf("active") >= 0);
+
+                if (isMsgVisible || isConfVisible) {
+                    return; // Do not show toast on confirm-view and msg-view is shown
+                }
                 var el = document.getElementById("toast");
                 el.innerHTML = msg;
                 el.style.display = "block";
@@ -880,13 +889,9 @@
                 }, 2000);
             },
             showOff: function() {
+                // 1. Locate button and text
                 document.getElementById("msg-title").innerHTML = "POWER OFF";
                 document.getElementById("msg-desc").innerHTML = "Raspberry Piが再起動すると自動で復帰します。";
-                var img = document.getElementById("msg-img");
-                img.src = "https://i.imgur.com/BWuYZXl.jpeg";
-                img.style.display = "inline-block";
-                img.style.maxHeight = "40vh";
-                img.style.width = "auto";
 
                 var btn = document.createElement("button");
                 btn.innerHTML = "RECONNECT";
@@ -895,35 +900,70 @@
                 btn.onclick = function() {
                     btn.innerHTML = "CHECKING...";
 
-                    // Check alive
                     var xhr = new XMLHttpRequest();
                     xhr.open("GET", "/api/sensor?_=" + new Date().getTime(), true);
-                    xhr.timeout = 5000;
+                    xhr.timeout = 3000;
+
+                    var handled = false;
+                    function handleError() {
+                        if (handled) return;
+                        handled = true;
+                        xhr.abort();
+                        btn.innerHTML = "NOT READY";
+                        setTimeout(function(){ btn.innerHTML = "RECONNECT"; }, 5000);
+                    }
 
                     xhr.onreadystatechange = function() {
                         if (xhr.readyState === 4) {
                             if (xhr.status === 200) {
+                                handled = true;
                                 location.reload();
-                            } else {
-                                btn.innerHTML = "NOT READY";
-                                setTimeout(function(){ btn.innerHTML = "RECONNECT"; }, 2000);
+                            } else if (xhr.status !== 0) {
+                                handleError();
                             }
                         }
                     };
 
-                    // エラーやタイムアウトの場合
                     xhr.onerror = xhr.ontimeout = function() {
-                        btn.innerHTML = "NOT READY";
-                        setTimeout(function(){ btn.innerHTML = "RECONNECT"; }, 2000);
+                        handleError();
                     };
-
+                    setTimeout(function() {
+                        if (!handled) handleError();
+                    }, 5000);
                     xhr.send();
                 };
 
+                // Add button to screen
                 var act = document.getElementById("msg-act");
                 act.innerHTML = "";
                 act.appendChild(btn);
 
+                // 2. Preparing image
+                var img = document.getElementById("msg-img");
+                img.style.display = "inline-block";
+                img.style.width = "auto";
+                img.style.height = "auto";
+                img.style.maxHeight = "none";
+
+                // 3. Calculate remained height
+                document.getElementById("msg-view").className = "overlay active";
+
+                var winH = window.innerHeight;
+                var hTitle = document.getElementById("msg-title").offsetHeight;
+                var hDesc = document.getElementById("msg-desc").offsetHeight;
+                var hBtn = act.offsetHeight;
+
+                var margins = 120;
+                var availableH = winH - (hTitle + hDesc + hBtn + margins);
+
+                // Prevent minus value
+                if (availableH < 50) availableH = 50;
+
+                // Load image with calculated pixel
+                img.style.maxHeight = availableH + "px";
+                img.src = "https://i.imgur.com/BWuYZXl.jpeg";
+
+                // 4. Auto reconnection polling
                 setInterval(function() {
                     var xhr = new XMLHttpRequest();
                     xhr.open("GET", "/api/sensor?_=" + new Date().getTime(), true);
