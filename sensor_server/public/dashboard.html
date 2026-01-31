@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hakoirimusume Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+    <style type="text/css">
+        /* --- Base Setup --- */
+        * { box-sizing: border-box; }
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background-color: #ffffff;
+            font-family: "Comfortaa", sans-serif;
+            color: #000000;
+            user-select: none;
+        }
+
+        /* --- Main Layout Table --- */
+        #layout {
+            width: 100%; height: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        /* --- Header (14%) --- */
+        .row-head { height: 14%; vertical-align: middle; }
+        #header-box {
+            width: 100%; height: 100%;
+            border-bottom: 4px solid #000;
+            position: relative;
+        }
+
+        /* Connection Icon (Top Left) */
+        #conn-status {
+            position: absolute; top: 0; left: 0;
+            width: 100px; height: 100%;
+            display: table;
+            text-align: center;
+            z-index: 10;
+        }
+        .conn-cell { display: table-cell; vertical-align: middle; }
+        #conn-img { width: 45px; height: 45px; vertical-align: middle; }
+
+        /* Menu Button (Top Right) */
+        #menu-btn {
+            position: absolute; top: 0; right: 0;
+            width: 120px; height: 100%;
+            line-height: 100%;
+            font-size: 55px;
+            text-align: center;
+            cursor: pointer; z-index: 10;
+            background: #fff;
+            display: table;
+        }
+        #menu-btn span { display: table-cell; vertical-align: middle; }
+
+        /* Time Display (Center) */
+        .time-group {
+            display: inline-block;
+            line-height: 1.0;
+        }
+        /* Label: Tiny text */
+        #time-lbl {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            display: block;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #time-table {
+            width: 100%; height: 100%;
+            border-collapse: collapse;
+        }
+        #time-cell {
+            text-align: center; vertical-align: middle;
+            padding-left: 80px; padding-right: 80px;
+        }
+        #time-val {
+            font-size: 50px;
+            font-weight: 700; color: #000;
+            display: block;
+            line-height: 1.0;
+            white-space: nowrap;
+        }
+
+        /* Stale Mode */
+        .stale #header-box { background: #000; color: #fff; }
+        .stale #menu-btn { background: #000; color: #fff; }
+        .stale #time-val { color: #fff; }
+
+        /* --- Main Content (70%) --- */
+        .row-main { height: 66%; vertical-align: middle; }
+        .val-table {
+            width: 100%; height: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .val-cell {
+            width: 33.33%;
+            text-align: center; vertical-align: middle;
+            padding: 0;
+            border: none;
+        }
+
+        /* Value Styling */
+        .val-container {
+            display: inline-block;
+            width: 100%;
+        }
+
+        /* 1. Icon */
+        .val-icon {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .icon-img {
+            width: 80px; height: 80px;
+            display: inline-block;
+        }
+
+        /* 2. Label */
+        .val-label {
+            display: block;
+            font-size: 40px; font-weight: 700;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        /* 3. Value (Big) */
+        .val-num {
+            font-size: 140px;
+            font-weight: 700;
+            line-height: 1.0;
+            letter-spacing: -6px;
+            display: block;
+            margin-bottom: 15px;
+            padding-top: 5px;
+        }
+
+        /* 4. Unit */
+        .val-unit {
+            display: block;
+            font-size: 60px;
+            font-weight: 700;
+            color: #000;
+            line-height: 1.0;
+        }
+
+        /* --- Footer (16%) --- */
+        .row-foot { height: 20%; vertical-align: middle; }
+        .btn-table {
+            width: 100%; height: 100%;
+            border-collapse: collapse;
+            border-top: 4px solid #000;
+            table-layout: fixed;
+        }
+        .btn-cell {
+            text-align: center; vertical-align: middle;
+            cursor: pointer;
+            background: #fff;
+            padding: 0;
+        }
+        .btn-cell:active { background: #000; color: #fff; }
+
+        .btn-sep {
+            width: 4px;
+            vertical-align: middle;
+            padding: 0;
+        }
+        .sep-line {
+            width: 3px;
+            height: 60%;
+            background: #000;
+            margin: 0 auto;
+        }
+
+        .btn-content { display: inline-block; }
+        .btn-img { width: 50px; height: 50px; vertical-align: middle; margin-right: 8px; }
+        .btn-txt { font-size: 50px; font-weight: 700; vertical-align: middle; }
+
+        /* --- Overlays --- */
+        .overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #fff; z-index: 50;
+            display: none;
+        }
+        .overlay.active { display: block; }
+
+        /* Menu */
+        #menu-view { z-index: 60; }
+        .menu-header {
+            height: 14%; /* Matched with Main Header (14%) */
+            border-bottom: 3px solid #000;
+            text-align: right; vertical-align: middle;
+            display: table; width: 100%;
+        }
+        .menu-close-cell {
+            display: table-cell; vertical-align: middle;
+            padding-right: 20px;
+        }
+        /* Common Close Button Style */
+        .menu-close { font-size: 40px; font-weight: bold; cursor: pointer; }
+
+        .menu-content { padding: 40px; text-align: center; }
+        .menu-lbl { font-size: 32px; font-weight: bold; display: block; margin-bottom: 15px; }
+        select { font-size: 32px; padding: 15px; width: 100%; border: 3px solid #000; background: #fff; }
+
+        .shutdown-btn {
+            background: #000; color: #fff; border: none;
+            font-size: 50px; padding: 30px;
+            font-weight: 700;
+            font-family: inherit; cursor: pointer; width: 100%;
+            margin-top: 60px;
+        }
+        .shutdown-icon {
+            width: 50px; height: 50px; vertical-align: middle;
+            margin-right: 20px;
+        }
+
+        /* --- Graph View --- */
+        #graph-view { z-index: 55; background: #fff; }
+        #graph-layout {
+            width: 100%; height: 100%;
+            border-collapse: collapse; table-layout: fixed;
+        }
+        .gh-row { height: 14%; vertical-align: middle; } /* Matched with Main Header (14%) */
+        #graph-head-cell { border-bottom: 4px solid #000; padding: 0 10px; }
+        .gb-row { height: 86%; vertical-align: middle; } /* Remaining height (86%) */
+        #graph-body-cell { padding: 0; position: relative; }
+
+        .gh-content-table { width: 100%; height: 100%; }
+        .gh-left { text-align: left; vertical-align: middle; }
+        .gh-right { text-align: right; vertical-align: middle; }
+
+        /* Graph Tabs */
+        .g-tab {
+            border: 3px solid #000;
+            margin-right: 10px; cursor: pointer;
+            display: inline-block;
+            padding: 10px 15px; /* Adjust padding for icon */
+            background: #fff;
+            vertical-align: middle;
+        }
+        .g-tab.active { background: #000; color: #fff; }
+
+        /* Icon & Text in Tab */
+        .g-tab-icon {
+            width: 40px; height: 40px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        .g-tab-txt {
+            font-size: 30px; font-weight: bold;
+            vertical-align: middle;
+        }
+        /* Invert icon color when tab is active (Black background) */
+        .g-tab.active .g-tab-icon {}
+
+        /* Canvas */
+        #g-cvs { display: block; width: 100%; height: 100%; }
+
+        /* Toast */
+        #toast {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #000; color: #fff; text-align: center;
+            padding: 10px 0; font-size: 20px; font-weight: bold;
+            z-index: 99; display: none;
+        }
+
+        /* Message */
+        #msg-table { width: 100%; height: 100%; border-collapse: collapse; }
+        #msg-cell { text-align: center; vertical-align: middle; }
+        #msg-title { font-size: 50px; font-weight: bold; margin-bottom: 30px; }
+        #msg-desc { font-size: 26px; margin-bottom: 30px; line-height: 1.4; padding: 0 20px; }
+        #msg-img { max-width: 80%; border: none; margin-bottom: 30px; }
+        .reconnect-btn {
+            font-size: 30px; padding: 20px 40px;
+            border: 3px solid #000; background: #fff;
+            font-weight: bold; cursor: pointer;
+        }
+    </style>
+
+    <script type="text/javascript">
+        window.onerror = function(msg, url, line) { return true; };
+    </script>
+</head>
+<body>
+
+    <!-- Main Layout -->
+    <table id="layout">
+        <tr>
+            <td class="row-head">
+                <div id="header-box">
+                    <!-- Left: Connection Icon -->
+                    <div id="conn-status">
+                        <div class="conn-cell">
+                            <img id="conn-img" src="notconnected.png">
+                        </div>
+                    </div>
+
+                    <!-- Center: Time -->
+                    <table id="time-table">
+                        <tr>
+                            <td id="time-cell">
+                                <div class="time-group">
+                                    <span id="time-lbl">Last Update</span>
+                                    <span id="time-val">Fetching Data...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Right: Menu Button -->
+                    <div id="menu-btn" onclick="app.toggleMenu()"><span>≡</span></div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="row-main">
+                <table class="val-table">
+                    <tr>
+                        <!-- Temp -->
+                        <td class="val-cell">
+                            <div class="val-container">
+                                <div class="val-icon"><img src="temp.png" class="icon-img"></div>
+                                <div class="val-label">Temp.</div>
+                                <div id="v-temp" class="val-num">--</div>
+                                <div class="val-unit">&deg;C</div>
+                            </div>
+                        </td>
+                        <!-- Humid -->
+                        <td class="val-cell">
+                            <div class="val-container">
+                                <div class="val-icon"><img src="waterdrop.png" class="icon-img"></div>
+                                <div class="val-label">Hum.</div>
+                                <div id="v-hum" class="val-num">--</div>
+                                <div class="val-unit">%</div>
+                            </div>
+                        </td>
+                        <!-- Press -->
+                        <td class="val-cell">
+                            <div class="val-container">
+                                <div class="val-icon"><img src="wind.png" class="icon-img"></div>
+                                <div class="val-label">Press.</div>
+                                <div id="v-pres" class="val-num">--</div>
+                                <div class="val-unit">hPa</div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="row-foot">
+                <table class="btn-table">
+                    <tr>
+                        <td class="btn-cell" onclick="app.showGraph()">
+                            <div class="btn-content">
+                                <img src="graph.png" class="btn-img">
+                                <span class="btn-txt">GRAPH</span>
+                            </div>
+                        </td>
+                        <td class="btn-sep"><div class="sep-line"></div></td>
+                        <td class="btn-cell" onclick="app.manualUpdate()">
+                            <div class="btn-content">
+                                <img src="reload.png" class="btn-img">
+                                <span class="btn-txt">UPDATE</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <div id="toast">Connecting...</div>
+
+    <!-- Menu Overlay -->
+    <div id="menu-view" class="overlay">
+        <div class="menu-header">
+            <div class="menu-close-cell">
+                <span class="menu-close" onclick="app.toggleMenu()">✖ CLOSE</span>
+            </div>
+        </div>
+        <div class="menu-content">
+            <div class="menu-item">
+                <span class="menu-lbl">Update Interval</span>
+                <select id="set-int" onchange="app.saveConf()">
+                    <option value="60000">1 Min.</option>
+                    <option value="120000">2 Min.</option>
+                    <option value="300000">5 Min.</option>
+                    <option value="600000">10 Min.</option>
+                    <option value="900000">15 Min.</option>
+                    <option value="1800000">30 Min.</option>
+                    <option value="3600000">60 Min.</option>
+                </select>
+            </div>
+            <button class="shutdown-btn" onclick="app.startShutdown()">
+                <img src="power.png" class="shutdown-icon">SHUT DOWN
+            </button>
+        </div>
+    </div>
+
+    <!-- Graph Overlay -->
+    <div id="graph-view" class="overlay">
+        <table id="graph-layout">
+            <tr class="gh-row">
+                <td id="graph-head-cell">
+                    <table class="gh-content-table">
+                        <tr>
+                            <td class="gh-left">
+                                <!-- Tabs with Icons -->
+                                <span id="gt-temp" class="g-tab active" onclick="app.drawGraph('temp')">
+                                    <img src="temp.png" class="g-tab-icon"><span class="g-tab-txt">Temp.</span>
+                                </span>
+                                <span id="gt-hum" class="g-tab" onclick="app.drawGraph('hum')">
+                                    <img src="waterdrop.png" class="g-tab-icon"><span class="g-tab-txt">Hum.</span>
+                                </span>
+                                <span id="gt-pres" class="g-tab" onclick="app.drawGraph('pres')">
+                                    <img src="wind.png" class="g-tab-icon"><span class="g-tab-txt">Press.</span>
+                                </span>
+                            </td>
+                            <td class="gh-right">
+                                <!-- Close Button (Matched Style) -->
+                                <span class="menu-close" onclick="app.closeGraph()">✖ CLOSE</span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr class="gb-row">
+                <td id="graph-body-cell">
+                    <canvas id="g-cvs"></canvas>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Shutdown Confirm Message Overlay -->
+    <div id="msg-view" class="overlay">
+        <table id="msg-table">
+            <tr>
+                <td id="msg-cell">
+                    <div id="msg-title">TITLE</div>
+                    <img id="msg-img" src="" style="display:none;">
+                    <div id="msg-desc">Description</div>
+                    <div id="msg-act"></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="confirm-view" class="overlay">
+        <table style="width:100%; height:100%; border-collapse:collapse;">
+            <tr>
+                <td style="text-align:center; vertical-align:middle;">
+                    <div style="border:4px solid #000; display:inline-block; background:#fff; padding:40px; width:95%;">
+                        <div style="font-size:40px; font-weight:bold; margin-bottom:40px;">
+                            箱入り娘をシャットダウンしてよろしいですか？
+                        </div>
+
+                        <button class="shutdown-btn" onclick="app.doShutdown()" style="margin-top:0; margin-bottom:30px;">
+                            シャットダウンする
+                        </button>
+
+                        <button class="shutdown-btn" onclick="app.hideConfirm()" style="background:#fff; color:#000; border:4px solid #000; margin-top:0;">
+                            キャンセル
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script type="text/javascript">
+        var app = {
+            conf: { int: 300000 },
+            state: { last: 0, timer: null, gData: null },
+
+            init: function() {
+                if (window.localStorage) {
+                    var s = localStorage.getItem("conf_int");
+                    if (s) this.conf.int = parseInt(s, 10);
+                }
+                var sel = document.getElementById("set-int");
+                if (sel) sel.value = this.conf.int;
+
+                setInterval(function() { app.tick(); }, 1000);
+                this.update();
+                this.startTimer();
+            },
+
+            startTimer: function() {
+                if (this.state.timer) clearInterval(this.state.timer);
+                this.state.timer = setInterval(function() { app.update(); }, this.conf.int);
+            },
+
+            tick: function() {
+                var now = new Date();
+                var ts = now.getTime();
+                // Stale check
+                if (this.state.last > 0 && (ts - this.state.last > 1800000)) {
+                    document.body.className = "stale";
+                } else {
+                    document.body.className = "";
+                }
+            },
+
+            manualUpdate: function() {
+                this.toast("Updating...", false);
+                this.update();
+            },
+
+            setConnIcon: function(ok) {
+                var img = document.getElementById("conn-img");
+                var target = ok ? "connected.png" : "notconnected.png";
+
+                var currentSrc = img.src;
+                var currentFilename = currentSrc.substring(currentSrc.lastIndexOf('/') + 1);
+
+                if (currentFilename !== target) {
+                    img.src = target;
+                }
+            },
+
+            update: function() {
+                var xhr = new XMLHttpRequest();
+                var ts = new Date().getTime();
+                xhr.open("GET", "/api/sensor?_=" + ts, true);
+
+                xhr.timeout = 10000;
+                xhr.ontimeout = function() {
+                    app.toast("Connection Timeout", true);
+                    app.setConnIcon(false);
+                };
+                xhr.onerror = function() {
+                    app.toast("Network Error", true);
+                    app.setConnIcon(false);
+                };
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            try {
+                                var d = JSON.parse(xhr.responseText);
+                                app.render(d);
+                                // app.toast("Updated", false);
+                                app.setConnIcon(true);
+                            } catch(e) {
+                                app.toast("Data Error", true);
+                                app.setConnIcon(false);
+                            }
+                        } else {
+                            app.toast("Connection Failed: " + xhr.status, true);
+                            app.setConnIcon(false);
+                        }
+                    }
+                };
+                xhr.send();
+            },
+
+            render: function(d) {
+                var now = new Date();
+                this.state.last = now.getTime();
+
+                var t = (d.temp !== null) ? parseFloat(d.temp).toFixed(1) : "--";
+                var h = (d.humid !== null) ? parseFloat(d.humid).toFixed(1) : "--";
+                var p = (d.press !== null) ? parseFloat(d.press).toFixed(0) : "--";
+
+                document.getElementById("v-temp").innerHTML = t;
+                document.getElementById("v-hum").innerHTML = h;
+                document.getElementById("v-pres").innerHTML = p;
+
+                // Time Update
+                var days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+                var Y = now.getFullYear();
+                var M = ("0"+(now.getMonth()+1)).slice(-2);
+                var D = ("0"+now.getDate()).slice(-2);
+                var day = days[now.getDay()];
+                var HH = ("0"+now.getHours()).slice(-2);
+                var MM = ("0"+now.getMinutes()).slice(-2);
+                var SS = ("0"+now.getSeconds()).slice(-2);
+                var timeStr = Y + "." + M + "." + D + " " + day + " " + HH + ":" + MM + ":" + SS;
+
+                var el = document.getElementById("time-val");
+                if(el) el.innerHTML = timeStr;
+
+                document.body.className = "";
+            },
+
+            toast: function(msg, stick) {
+                var msgView = document.getElementById("msg-view");
+                var confView = document.getElementById("confirm-view");
+
+                var isMsgVisible = (msgView && msgView.className.indexOf("active") >= 0);
+                var isConfVisible = (confView && confView.className.indexOf("active") >= 0);
+
+                if (isMsgVisible || isConfVisible) {
+                    return; // Do not show toast on confirm-view and msg-view is shown
+                }
+                var el = document.getElementById("toast");
+                el.innerHTML = msg;
+                el.style.display = "block";
+                if (!stick) {
+                    setTimeout(function() { el.style.display = "none"; }, 2000);
+                }
+            },
+
+            toggleMenu: function() {
+                var el = document.getElementById("menu-view");
+                el.className = (el.className.indexOf("active") >= 0) ? "overlay" : "overlay active";
+            },
+            saveConf: function() {
+                var v = document.getElementById("set-int").value;
+                this.conf.int = parseInt(v, 10);
+                if (window.localStorage) localStorage.setItem("conf_int", this.conf.int);
+                this.startTimer();
+                this.toast("Saved", false);
+            },
+
+            showGraph: function() {
+                document.getElementById("graph-view").className = "overlay active";
+                this.loadGraph();
+            },
+            closeGraph: function() {
+                document.getElementById("graph-view").className = "overlay";
+            },
+            loadGraph: function() {
+                var cvs = document.getElementById("g-cvs");
+                var ctx = cvs.getContext("2d");
+                var rect = cvs.parentElement.getBoundingClientRect();
+                cvs.width = rect.width;
+                cvs.height = rect.height;
+
+                ctx.clearRect(0,0,cvs.width,cvs.height);
+                ctx.font = "40px Arial";
+                ctx.fillText("Loading History...", 50, 80);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/api/history?_=" + new Date().getTime(), true);
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        try {
+                            app.state.gData = JSON.parse(xhr.responseText);
+                            app.drawGraph("temp");
+                        } catch(e) {}
+                    }
+                };
+                xhr.send();
+            },
+
+            drawGraph: function(mode) {
+                // --- 1. Tab & Icon Logic ---
+                var tabs = ["temp", "hum", "pres"];
+                for(var i=0; i<tabs.length; i++) {
+                    var name = tabs[i];
+                    var el = document.getElementById("gt-" + name);
+                    var img = el.getElementsByTagName("img")[0];
+                    var src = img.src;
+                    var isInverted = (src.indexOf("_inverted.png") !== -1);
+
+                    if (name === mode) {
+                        el.className = "g-tab active";
+                        if (!isInverted) img.src = src.replace(".png", "_inverted.png");
+                    } else {
+                        el.className = "g-tab";
+                        if (isInverted) img.src = src.replace("_inverted.png", ".png");
+                    }
+                }
+
+                // --- 2. Data Preparation ---
+                var raw = this.state.gData;
+                if (!raw || raw.length === 0) return;
+
+                var cvs = document.getElementById("g-cvs");
+                var ctx = cvs.getContext("2d");
+                var W = cvs.width;
+                var H = cvs.height;
+
+                // Clear
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(0,0,W,H);
+
+                // Margins
+                var padL = 90; var padR = 30; var padT = 30; var padB = 60;
+                var plotW = W - padL - padR;
+                var plotH = H - padT - padB;
+
+                var now = new Date().getTime() / 1000;
+                var startT = now - (24 * 3600);
+
+                // Find Min/Max
+                var min = 99999; var max = -99999;
+                var key = (mode==="hum")?"humid":((mode==="pres")?"press":"temp");
+
+                var pts = [];
+                for(var j=0; j<raw.length; j++) {
+                    var r = raw[j];
+                    var val = parseFloat(r[key]);
+                    if (!isNaN(val)) {
+                        if (val < min) min = val;
+                        if (val > max) max = val;
+                        pts.push({ t: r.ts, v: val });
+                    }
+                }
+                if (pts.length === 0) return;
+
+                // --- 3. Simple Integer Scale Algorithm ---
+
+                // A. Determine Step Size (Integer >= 1)
+                // We want max 10 ticks.
+                var dataRange = max - min;
+                if (dataRange < 0) dataRange = 0;
+
+                // If range is 12, step=2. If range is 0.5, step=1.
+                var rawStep = dataRange / 10;
+                var step = Math.ceil(rawStep);
+                if (step < 1) step = 1;
+
+                // B. Align Min/Max to Step
+                var graphMin = Math.floor(min / step) * step;
+                var graphMax = Math.ceil(max / step) * step;
+
+                // C. Ensure at least 5 ticks (Expand range if needed)
+                // Current ticks = (graphMax - graphMin) / step
+                // We expand outwards until we have enough ticks.
+                var ticks = Math.round((graphMax - graphMin) / step);
+
+                while (ticks < 4) {
+                    // Add to top
+                    graphMax += step;
+                    ticks++;
+                    if (ticks >= 4) break;
+
+                    // Add to bottom
+                    graphMin -= step;
+                    ticks++;
+                }
+
+                // Final Range
+                var graphRange = graphMax - graphMin;
+
+                // --- 4. Draw Axes ---
+                ctx.strokeStyle = "#888";
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(padL, padT); ctx.lineTo(padL, H - padB); // Y-axis
+                ctx.moveTo(padL, H - padB); ctx.lineTo(W - padR, H - padB); // X-axis
+                ctx.stroke();
+
+                // --- 5. Draw Y-Ticks (Integer Loop) ---
+                ctx.fillStyle = "#000";
+                ctx.font = "20px Arial";
+                ctx.textAlign = "right";
+                ctx.textBaseline = "middle";
+
+                // Loop exactly "ticks" times + 1 (for 0 to N)
+                for (var i = 0; i <= ticks; i++) {
+                    var val = graphMin + (i * step);
+
+                    // Calculate Y position
+                    // Y = Bottom - (Ratio * Height)
+                    var ratio = (val - graphMin) / graphRange;
+                    var yPos = H - padB - (ratio * plotH);
+
+                    // Grid line
+                    ctx.strokeStyle = "#eee";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(padL, yPos); ctx.lineTo(W - padR, yPos);
+                    ctx.stroke();
+
+                    // Label (No decimals)
+                    ctx.fillText(val.toFixed(0), padL - 10, yPos);
+                }
+
+                // --- 6. X Labels (Time) ---
+                ctx.textAlign = "center";
+                ctx.textBaseline = "top";
+                for(var h=0; h<=24; h+=2) {
+                    var labelT = now - (h * 3600);
+                    var xPos = padL + ((labelT - startT) / (24*3600)) * plotW;
+
+                    // Draw if within range (with slight buffer)
+                    if (xPos >= padL - 10 && xPos <= W - padR + 10) {
+                        if (h === 0) {
+                            ctx.fillText("now", xPos, H - padB + 15);
+                        } else {
+                            ctx.fillText("-" + h + "h", xPos, H - padB + 15);
+                        }
+                        ctx.strokeStyle = "#eee";
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(xPos, padT); ctx.lineTo(xPos, H - padB);
+                        ctx.stroke();
+                    }
+                }
+
+                // --- 7. Plot Line ---
+                ctx.strokeStyle = "#000";
+                ctx.lineWidth = 6;
+                ctx.lineJoin = "round";
+                ctx.lineCap = "round";
+                ctx.beginPath();
+
+                var first = true;
+                for(var m=0; m<pts.length; m++) {
+                    var p = pts[m];
+                    var x = padL + ((p.t - startT) / (24*3600)) * plotW;
+                    var y = H - padB - ((p.v - graphMin) / graphRange) * plotH;
+
+                    if (x < padL) continue;
+
+                    if (first) {
+                        ctx.moveTo(x, y);
+                        first = false;
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+
+                // --- 8. Plot Points ---
+                // ctx.fillStyle = "#000";
+                // ctx.beginPath();
+                // for(var m=0; m<pts.length; m++) {
+                //     var p = pts[m];
+                //     var x = padL + ((p.t - startT) / (24*3600)) * plotW;
+                //     var y = H - padB - ((p.v - graphMin) / graphRange) * plotH;
+
+                //     if (x < padL) continue;
+
+                //     ctx.moveTo(x + 4, y);
+                //     ctx.arc(x, y, 4, 0, Math.PI * 2);
+                // }
+                // ctx.fill();
+            },
+
+            startShutdown: function() {
+                this.toggleMenu();
+                var el = document.getElementById("confirm-view");
+                // Show Overlay
+                el.className = "overlay active";
+            },
+
+            // On shutdown canceled
+            hideConfirm: function() {
+                var el = document.getElementById("confirm-view");
+                el.className = "overlay";
+            },
+
+            doShutdown: function() {
+                this.hideConfirm();
+
+                // メッセージ表示
+                this.showMsg("シャットダウンしています...", "Raspberry Pi内部の緑色LEDが消灯するまでお待ちください", "instruction.jpg");
+
+                // APIリクエスト
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/api/shutdown", true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) app.pollDeath();
+                };
+                xhr.send();
+            },
+            pollDeath: function() {
+                var fail = 0;
+                var tm = setInterval(function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "/api/sensor?_=" + new Date().getTime(), true);
+                    xhr.timeout = 2000;
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4 && xhr.status === 200) fail = 0;
+                    };
+                    xhr.onerror = xhr.ontimeout = function() {
+                        fail++;
+                        if (fail > 3) {
+                            clearInterval(tm);
+                            app.showOff();
+                        }
+                    };
+                    xhr.send();
+                }, 2000);
+            },
+            showOff: function() {
+                // 1. Locate button and text
+                document.getElementById("msg-title").innerHTML = "POWER OFF";
+                document.getElementById("msg-desc").innerHTML = "Raspberry Piが再起動すると自動で復帰します。";
+
+                var btn = document.createElement("button");
+                btn.innerHTML = "RECONNECT";
+                btn.className = "reconnect-btn";
+                btn.style.marginTop = "10px";
+                btn.onclick = function() {
+                    btn.innerHTML = "CHECKING...";
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "/api/sensor?_=" + new Date().getTime(), true);
+                    xhr.timeout = 3000;
+
+                    var handled = false;
+                    function handleError() {
+                        if (handled) return;
+                        handled = true;
+                        xhr.abort();
+                        btn.innerHTML = "NOT READY";
+                        setTimeout(function(){ btn.innerHTML = "RECONNECT"; }, 5000);
+                    }
+
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status === 200) {
+                                handled = true;
+                                location.reload();
+                            } else if (xhr.status !== 0) {
+                                handleError();
+                            }
+                        }
+                    };
+
+                    xhr.onerror = xhr.ontimeout = function() {
+                        handleError();
+                    };
+                    setTimeout(function() {
+                        if (!handled) handleError();
+                    }, 5000);
+                    xhr.send();
+                };
+
+                // Add button to screen
+                var act = document.getElementById("msg-act");
+                act.innerHTML = "";
+                act.appendChild(btn);
+
+                // 2. Preparing image
+                var img = document.getElementById("msg-img");
+                img.style.display = "inline-block";
+                img.style.width = "auto";
+                img.style.height = "auto";
+                img.style.maxHeight = "none";
+
+                // 3. Calculate remained height
+                document.getElementById("msg-view").className = "overlay active";
+
+                var winH = window.innerHeight;
+                var hTitle = document.getElementById("msg-title").offsetHeight;
+                var hDesc = document.getElementById("msg-desc").offsetHeight;
+                var hBtn = act.offsetHeight;
+
+                var margins = 120;
+                var availableH = winH - (hTitle + hDesc + hBtn + margins);
+
+                // Prevent minus value
+                if (availableH < 50) availableH = 50;
+
+                // Load image with calculated pixel
+                img.style.maxHeight = availableH + "px";
+                img.src = "https://i.imgur.com/BWuYZXl.jpeg";
+
+                // 4. Auto reconnection polling
+                setInterval(function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "/api/sensor?_=" + new Date().getTime(), true);
+                    xhr.timeout = 5000;
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4 && xhr.status === 200) location.reload();
+                    };
+                    xhr.send();
+                }, 10000);
+            },
+            showMsg: function(ti, de, img) {
+                var el = document.getElementById("msg-view");
+                el.className = "overlay active";
+                document.getElementById("msg-title").innerHTML = ti;
+                document.getElementById("msg-desc").innerHTML = de;
+                var im = document.getElementById("msg-img");
+                if (img) {
+                    im.src = img;
+                    im.style.display = "inline-block";
+                } else {
+                    im.style.display = "none";
+                }
+                document.getElementById("msg-act").innerHTML = "";
+            }
+        };
+
+        window.onload = function() { app.init(); };
+    </script>
+</body>
+</html>

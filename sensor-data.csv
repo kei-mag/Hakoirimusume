@@ -1,1 +1,1 @@
-deletehash, image-link, temp, humid, pressure, datetime
+datetime,temperature,humidity,pressure,imagelink,deletehash

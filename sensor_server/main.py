@@ -3,6 +3,7 @@ import http.server
 import json
 import os
 import re
+import csv
 from urllib.parse import parse_qs, urlparse
 
 import imgur
@@ -10,12 +11,10 @@ import imgur
 try:
     import tomllib
 except ImportError:
-    import tomli as tomllib  # If you run this script on Python 3.10 or earlier, please install `tomllib` via pip.
+    import tomli as tomllib
 
 CONFIG_FILE = "./config.toml"
-DASHBOARD_HTML_FILE = "templates/dashboard.html"
-SHUTTING_DOWN_HTML_FILE = "templates/shutting_down.html"
-RELOAD_INTERVAL = 600  # sec.
+DASHBOARD_HTML_FILE = "public/dashboard.html"
 ACCEPT_ADDR = "0.0.0.0"
 ENV_VAL_FORM = re.compile(r"\${(.+)}")
 
@@ -29,71 +28,41 @@ sensor_data_file = "./sensor_data.csv"
 log_level = "ALL"
 # ---------------------------------
 
-dashboard_html = """
-<!DOCTYPE HTML>
-<html lang="en">
-<head>
-<title>Hakoirimusume Sensor Server</title>
-<body>
-<h1>Dashboard is unavailable</h1>
-<p>Sensor Dashboard is not currently available</p>
-<p>Please check the status of server applications.</p>
-</body>
-</html>
-"""
-shutting_down_html = """
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta http-equiv="refresh" content="10;URL=/">
-    <meta charset="UTF-8">
-    <title>シャットダウン中</title>
-</head>
-<body>
-        <h1>サーバーをシャットダウンしています</h1>
-                <p>シャットダウンには30秒ほどかかります。本体のLEDが消灯するまで電源コードを抜かないでください。</p>
-                
-            </body>
-            </html>
-"""
 camera = None
 bme280 = None
 
-
 def main():
-    global camera, bme280, dashboard_html
+    global camera, bme280
     os.chdir(os.path.dirname(__file__))
-    print("Hakoirimusume Sensor Server")
+    print("Hakoirimusume Sensor Server (Enhanced)")
     load_config()
-    print("----- Running Info -----")
-    print(f"Working directory: {os.getcwd()}")
-    print(f"Loaded config file: {os.path.abspath(CONFIG_FILE)}")
-    print(f"Listening PORT: {port}")
-    print(f"Imgur Client ID: {imgur_client_id}")
-    print(f"Enable Camera: {enable_camera}")
-    print(f"BME280 I2C-BUS: {i2c_bus}")
-    print(f"BME280 I2C-ADDR: 0x{i2c_addr:x}")
-    print(f"Sensor Data File: {sensor_data_file}")
-    print("------------------------")
+
+    # Initialize Devices
     try:
         from bme280 import BME280
         bme280 = BME280(i2c_bus, i2c_addr)
+        print("BME280 initialized.")
     except Exception as e:
-        print("Error has occurred while initializing BME280. Continue without BME 280: ", e)
+        print("BME280 Init Error: ", e)
+
     if enable_camera:
         try:
             from picamera import PiCamera
             camera = PiCamera()
+            print("PiCamera initialized.")
         except Exception as e:
-            print("Error has occurred while initializing PiCamera. Continue without PiCamera: ", e)
+            print("PiCamera Init Error: ", e)
+
+    # Start Server
+    server_address = (ACCEPT_ADDR, port)
     try:
-        with open(DASHBOARD_HTML_FILE, "r", encoding="UTF-8") as file:
-            dashboard_html = file.read()
-            dashboard_html = dashboard_html.replace("{{INTERVAL}}", str(RELOAD_INTERVAL))
-    except Exception as e:
-        print("Error has occurred while reading dashboard.html, dashboard is not available: ", e)
-    with http.server.HTTPServer((ACCEPT_ADDR, port), CustomHTTPRequestHandler) as httpd:
-        print("serving at port", port)
+        from http.server import ThreadingHTTPServer
+        ServerClass = ThreadingHTTPServer
+    except ImportError:
+        ServerClass = http.server.HTTPServer
+
+    with ServerClass(server_address, CustomHTTPRequestHandler) as httpd:
+        print(f"Serving at {ACCEPT_ADDR}:{port}")
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
@@ -102,12 +71,6 @@ def main():
 
 
 def dict_get(d, key, default=None):
-    """ Get value from dictionary with dot-separated key
-    :param d: Dictionary to be searched
-    :param key: Target key (dot-separated format is available, e.g. "key1.key2.key3")
-    :param default: Default value if the key is not found
-    :return: Value of the key
-    """
     keys = key.split(".")
     for k in keys:
         if k in d:
@@ -119,18 +82,22 @@ def dict_get(d, key, default=None):
 
 def load_config():
     global port, imgur_client_id, enable_camera, i2c_bus, i2c_addr, sensor_data_file, log_level
-    config = tomllib.load(open(CONFIG_FILE, mode="rb"))
-    port = replace_env(dict_get(config, "server.port", port))
-    imgur_client_id = replace_env(dict_get(config, "imgur.client-id", imgur_client_id))
-    enable_camera = dict_get(config, "hardware.pi-camera", enable_camera)
-    i2c_bus = dict_get(config, "hardware.bme280.i2c-bus", i2c_bus)
-    i2c_addr = dict_get(config, "hardware.bme280.i2c-address", i2c_addr)
-    sensor_data_file = replace_env(dict_get(config, "datalog.filepath", sensor_data_file))
-    log_level = dict_get(config, "datalog.level", log_level)
-    cwd = os.getcwd()
-    os.chdir(os.path.dirname(CONFIG_FILE))
-    sensor_data_file = os.path.abspath(sensor_data_file)
-    os.chdir(cwd)
+    try:
+        config = tomllib.load(open(CONFIG_FILE, mode="rb"))
+        port = replace_env(dict_get(config, "server.port", port))
+        imgur_client_id = replace_env(dict_get(config, "imgur.client-id", imgur_client_id))
+        enable_camera = dict_get(config, "hardware.pi-camera", enable_camera)
+        i2c_bus = dict_get(config, "hardware.bme280.i2c-bus", i2c_bus)
+        i2c_addr = dict_get(config, "hardware.bme280.i2c-address", i2c_addr)
+        sensor_data_file = replace_env(dict_get(config, "datalog.filepath", sensor_data_file))
+        log_level = dict_get(config, "datalog.level", log_level)
+
+        cwd = os.getcwd()
+        os.chdir(os.path.dirname(CONFIG_FILE))
+        sensor_data_file = os.path.abspath(sensor_data_file)
+        os.chdir(cwd)
+    except Exception as e:
+        print(f"Config load failed: {e}")
 
 
 def replace_env(value):
@@ -141,125 +108,206 @@ def replace_env(value):
     return value
 
 
-def get_current_iso_timestamp(cur_time=datetime.datetime.now()):
-    # Calculate offset time without pytz package
-    offset = cur_time.replace(tzinfo=datetime.UTC) - datetime.datetime.now(datetime.UTC)
-    total_seconds = offset.total_seconds()
-    hours, remainder = divmod(total_seconds, 3600)
-    minutes, _ = divmod(remainder, 60)
-    offset_str = "{:+03d}:{:02d}".format(int(hours), int(minutes))
-    timestamp_iso = cur_time.replace(microsecond=0).isoformat() + offset_str
-    return timestamp_iso
+def get_current_iso_timestamp(cur_time=None):
+    if cur_time is None:
+        # Aware datetime with local timezone
+        cur_time = datetime.datetime.now().astimezone()
+    else:
+        if cur_time.tzinfo is None:
+            cur_time = cur_time.astimezone()
+
+    return cur_time.replace(microsecond=0).isoformat()
 
 
 def write_log(timestamp, temp, hum, press, image_url=None, deletehash=None):
-    with open(sensor_data_file, "a") as file:
-        file.write(f"{timestamp},{temp},{hum},{press},{image_url},{deletehash}\n")
+    try:
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(sensor_data_file), exist_ok=True)
+        with open(sensor_data_file, "a") as file:
+            file.write(f"{timestamp},{temp},{hum},{press},{image_url},{deletehash}\n")
+    except Exception as e:
+        print(f"Log write error: {e}")
+
+
+def read_history_24h():
+    """Read data from the last 24 hours"""
+    data = []
+    if not os.path.exists(sensor_data_file):
+        return data
+
+    try:
+        now = datetime.datetime.now().astimezone()
+        one_day_ago = now - datetime.timedelta(hours=24)
+
+        # Read file (might be large, but Pi Zero can handle simple CSV read)
+        with open(sensor_data_file, "r") as f:
+            reader = csv.reader(f)
+            # Read all lines (or use seek for optimization if file is > 10MB)
+            rows = list(reader)
+
+            # Iterate backwards to find relevant data
+            for row in reversed(rows):
+                if len(row) < 4: continue
+                try:
+                    # Parse timestamp
+                    ts_str = row[0]
+                    dt = datetime.datetime.fromisoformat(ts_str)
+
+                    # Stop if older than 24h
+                    if dt < one_day_ago:
+                        break
+
+                    # Parse values
+                    t = float(row[1]) if row[1] not in ["---", "None"] else None
+                    h = float(row[2]) if row[2] not in ["---", "None"] else None
+                    p = float(row[3]) if row[3] not in ["---", "None"] else None
+
+                    if t is not None:
+                        # Append dict
+                        data.append({
+                            "ts": dt.timestamp(), # UNIX timestamp for easier JS handling
+                            "temp": t,
+                            "humid": h,
+                            "press": p
+                        })
+                except ValueError:
+                    continue
+
+        # Reverse back to chronological order
+        data.reverse()
+
+    except Exception as e:
+        print(f"History read error: {e}")
+
+    return data
 
 
 class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
-    def _send_response(self, content, content_type="text/html"):
-        self.send_response(200)
+    def _send_response(self, content, content_type="text/html", status=200):
+        self.send_response(status)
         self.send_header("Content-Type", content_type)
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
-        self.wfile.write(content.encode())
+        if isinstance(content, str):
+            self.wfile.write(content.encode("utf-8"))
+        else:
+            self.wfile.write(content)
 
     def do_GET(self):
         parsed_path = urlparse(self.path)
         path = parsed_path.path
         query = parse_qs(parsed_path.query, keep_blank_values=True)
+
+        # 1. Dashboard
         if path == "/":
-            temp = press = humid = "---"
-            if bme280:
-                try:
-                    temp, press, humid = bme280.read_data()
-                    if log_level == "ALL":
-                        write_log(get_current_iso_timestamp(), temp, humid, press)
-                except Exception as e:
-                    print("Failed to get BME280 data: ", e)
-                else:
-                    temp = f"{temp:.1f}"
-                    humid = f"{humid:.1f}"
-                    press = f"{press:.0f}"
-            cur_time = datetime.datetime.now()
-            content = dashboard_html
-            content = content.replace("{{DATETIME}}", cur_time.strftime("%Y/%m/%d %H:%M:%S"))
-            content = content.replace("{{TEMP}}", temp)
-            content = content.replace("{{HUMID}}", humid)
-            content = content.replace("{{PRESS}}", press)
-            self._send_response(content)
-        elif path == "/get":
+            try:
+                with open(DASHBOARD_HTML_FILE, "r", encoding="UTF-8") as file:
+                    self._send_response(file.read())
+            except Exception as e:
+                self._send_response(f"Dashboard Error: {e}", status=500)
+
+        # 2. Static Files (Images)
+        elif path.endswith((".jpg", ".jpeg", ".png", ".ico")):
+            if ".." in path:
+                self.send_error(403)
+                return
+
+            # Look in public folder as requested by user
+            possible_paths = [
+                path.lstrip("/"),
+                os.path.join("public", path.lstrip("/")),
+                os.path.join("docs", path.lstrip("/"))
+            ]
+
+            served = False
+            for p in possible_paths:
+                if os.path.exists(p) and os.path.isfile(p):
+                    try:
+                        with open(p, "rb") as f:
+                            ext = os.path.splitext(p)[1].lower()
+                            mime = "image/jpeg" if ext in [".jpg", ".jpeg"] else "image/png"
+                            self._send_response(f.read(), content_type=mime)
+                            served = True
+                            break
+                    except:
+                        pass
+            if not served:
+                self.send_error(404)
+
+        # 3. API: Current Data
+        elif path == "/api/sensor" or path == "/get":
             temp = press = humid = None
             if bme280:
                 try:
                     temp, press, humid = bme280.read_data()
                 except Exception as e:
-                    print("Failed to get BME280 data: ", e)
-            cur_time = datetime.datetime.now()
-            cur_timestamp = get_current_iso_timestamp(cur_time)
-            content = {"time": cur_timestamp}
-            content["temp"] = temp
-            content["humid"] = humid
-            content["press"] = press
+                    print("BME280 Read Error: ", e)
+
+            cur_timestamp = get_current_iso_timestamp()
+            cur_time_obj = datetime.datetime.now().astimezone()
+
+            content = {
+                "time": cur_timestamp,
+                "temp": temp,
+                "humid": humid,
+                "press": press
+            }
+
             if "withcamera" in query:
                 content["photo"] = None
                 content["deletehash"] = None
                 if camera:
                     try:
-                        try:
-                            image = camera.capture_bytes()
-                        except Exception as e:
-                            print("Failed to capture image: ", e)
-                        else:
-                            if temp is None or humid is None or press is None:
-                                description = "Sensor data is not available."
-                            else:
-                                description = f"Temperature: {temp:.1f}, Humidity: {humid:.1f}%, Pressure: {press:.1f}hPa"
-                            ret = imgur.upload_as_anonymous(imgur_client_id, image,
-                                                            capture_datetime=cur_time.strftime("%Y/%m%d %H:%M:%S"),
-                                                            description=description)
-                            if len(ret) == 2:
-                                content["photo"], content["deletehash"] = ret
-                            else:
-                                print("Failed to upload image to Imgur: ", ret)
+                        image = camera.capture_bytes()
+                        desc = f"T:{temp}, H:{humid}, P:{press}"
+                        ret = imgur.upload_as_anonymous(
+                            imgur_client_id,
+                            image,
+                            capture_datetime=cur_time_obj.strftime("%Y/%m/%d %H:%M:%S"),
+                            description=desc
+                        )
+                        if isinstance(ret, tuple) and len(ret) == 2:
+                            content["photo"], content["deletehash"] = ret
                     except Exception as e:
-                        print("Failed to get PiCamera data: ", e)
-                    write_log(cur_timestamp, temp, humid, press, content["photo"], content["deletehash"])
-                else:
-                    write_log(cur_timestamp, temp, humid, press)
+                        print("Camera Error: ", e)
+
+                write_log(cur_timestamp, temp, humid, press, content.get("photo"), content.get("deletehash"))
             else:
                 if log_level == "ALL":
                     write_log(cur_timestamp, temp, humid, press)
+
             self._send_response(json.dumps(content), content_type="application/json")
+
+        # 4. API: History (24h)
+        elif path == "/api/history":
+            try:
+                data = read_history_24h()
+                self._send_response(json.dumps(data), content_type="application/json")
+            except Exception as e:
+                self._send_response(json.dumps({"error": str(e)}), content_type="application/json", status=500)
+
+        # 5. API: Shutdown
+        elif path == "/api/shutdown":
+            self._send_response(json.dumps({"status": "accepted"}), content_type="application/json")
+            try:
+                os.system("sudo shutdown -h now")
+            except Exception as e:
+                print(f"Shutdown failed: {e}")
+
         else:
-            self.send_response(404)
-            self.end_headers()
+            self.send_error(404)
 
     def do_POST(self):
+        # Backward compatibility
         if self.path == "/":
-            content = """
-            <!DOCTYPE html>
-            <html lang="ja">
-            <head>
-                <meta http-equiv="refresh" content="10;URL=/">
-                <meta charset="UTF-8">
-                <title>シャットダウン中</title>
-            </head>
-            <body>
-                <h1>サーバーをシャットダウンしています</h1>
-                <p>シャットダウンには30秒ほどかかります。本体のLEDが消灯するまで電源コードを抜かないでください。</p>
-                
-            </body>
-            </html>
-            """
-            # シャットダウンの処理
-            self._send_response(content)
+            self._send_response("Shutting down...", content_type="text/plain")
+            os.system("sudo shutdown -h now")
+        elif self.path == "/api/shutdown":
+            self._send_response(json.dumps({"status": "accepted"}), content_type="application/json")
             os.system("sudo shutdown -h now")
         else:
-            self.send_response(404)
-            self.end_headers()
-
+            self.send_error(404)
 
 if __name__ == "__main__":
     main()
