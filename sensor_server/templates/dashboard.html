@@ -18,7 +18,7 @@
             user-select: none;
         }
 
-        /* --- Layout Grid (Table) --- */
+        /* --- Main Layout Table --- */
         #layout {
             width: 100%; height: 100%;
             border-collapse: collapse;
@@ -36,9 +36,9 @@
         /* Menu Button */
         #menu-btn {
             position: absolute; top: 0; left: 0;
-            width: 80px; height: 100%;
+            width: 90px; height: 100%;
             line-height: 100%;
-            font-size: 60px;
+            font-size: 70px;
             text-align: center;
             cursor: pointer; z-index: 10;
             background: #fff;
@@ -55,20 +55,19 @@
         }
         #time-cell {
             text-align: right; vertical-align: middle;
-            padding-right: 15px;
+            padding-right: 10px;
             padding-left: 90px;
         }
         #last-update-time {
-            /* Kindle実機に合わせて調整 (前回140px -> 今回110px) */
-            font-size: 110px;
+            font-size: 140px;
             font-weight: 700;
-            line-height: 0.9;
-            letter-spacing: -4px;
+            line-height: 0.8;
+            letter-spacing: -6px;
             display: block;
         }
         #date-line {
-            font-size: 24px; font-weight: 700; color: #000;
-            margin-top: 2px; display: block; line-height: 1.0;
+            font-size: 26px; font-weight: 700; color: #000;
+            margin-top: 5px; display: block; line-height: 1.0;
         }
 
         /* Stale Mode */
@@ -97,14 +96,12 @@
             width: 100%;
         }
         .val-num {
-            /* PCでは崩れるレベルの巨大サイズ指定 */
-            font-size: 160px;
+            font-size: 110px;
             font-weight: 700;
-            line-height: 0.8;
-            letter-spacing: -8px;
+            line-height: 0.9;
+            letter-spacing: -4px;
             display: block;
-            margin-bottom: 5px;
-            padding-top: 10px; /* 上の線との間隔微調整 */
+            margin-bottom: 10px;
         }
         .val-meta {
             display: table; margin: 0 auto;
@@ -114,12 +111,11 @@
             padding-right: 10px;
         }
         .icon-img {
-            /* アイコンは少し控えめにして数値を目立たせる */
-            width: 40px; height: 40px; display: block;
+            width: 50px; height: 50px; display: block;
         }
         .meta-unit {
             display: table-cell; vertical-align: middle;
-            font-size: 24px; font-weight: 700; color: #000;
+            font-size: 32px; font-weight: 700; color: #000;
             text-align: left;
         }
 
@@ -143,7 +139,7 @@
 
         .btn-content { display: inline-block; }
         .btn-img { width: 50px; height: 50px; vertical-align: middle; margin-right: 15px; }
-        .btn-txt { font-size: 32px; font-weight: 700; vertical-align: middle; }
+        .btn-txt { font-size: 36px; font-weight: 700; vertical-align: middle; }
 
         /* --- Overlays --- */
         .overlay {
@@ -182,23 +178,43 @@
             margin-right: 20px; filter: invert(1);
         }
 
-        /* Graph */
-        #graph-view { z-index: 55; }
-        #graph-head {
-            height: 80px; border-bottom: 3px solid #000;
-            display: table; width: 100%;
+        /* --- Graph View (New Table Layout) --- */
+        #graph-view { z-index: 55; background: #fff; }
+        #graph-layout {
+            width: 100%; height: 100%;
+            border-collapse: collapse; table-layout: fixed;
         }
-        .gh-cell-left { display: table-cell; vertical-align: middle; padding-left: 10px; text-align: left; }
-        .gh-cell-right { display: table-cell; vertical-align: middle; padding-right: 10px; text-align: right; }
+        /* Header (20%) */
+        .gh-row { height: 20%; vertical-align: middle; }
+        #graph-head-cell {
+            border-bottom: 4px solid #000;
+            padding: 0 10px;
+        }
+        /* Graph Body (80%) */
+        .gb-row { height: 80%; vertical-align: middle; }
+        #graph-body-cell {
+            padding: 0; /* Full bleed */
+            position: relative;
+        }
 
-        #graph-body { width: 100%; height: calc(100% - 80px); padding: 5px; }
+        /* Header Content layout */
+        .gh-content-table { width: 100%; height: 100%; }
+        .gh-left { text-align: left; vertical-align: middle; }
+        .gh-right { text-align: right; vertical-align: middle; }
+
+        /* Controls */
         .g-tab {
-            font-size: 26px; padding: 10px 20px; border: 3px solid #000;
+            font-size: 28px; padding: 15px 25px; border: 3px solid #000;
             margin-right: 10px; cursor: pointer; font-weight: bold;
             display: inline-block;
         }
         .g-tab.active { background: #000; color: #fff; }
-        .close-btn { font-size: 40px; font-weight: bold; cursor: pointer; }
+        .close-btn { font-size: 50px; font-weight: bold; cursor: pointer; }
+
+        /* Canvas */
+        #g-cvs {
+            display: block; width: 100%; height: 100%;
+        }
 
         /* Toast */
         #toast {
@@ -214,8 +230,6 @@
         #msg-title { font-size: 50px; font-weight: bold; margin-bottom: 30px; }
         #msg-desc { font-size: 26px; margin-bottom: 30px; line-height: 1.4; padding: 0 20px; }
         #msg-img { max-width: 80%; border: 3px solid #000; margin-bottom: 30px; }
-
-        /* Reconnect Btn */
         .reconnect-btn {
             font-size: 30px; padding: 20px 40px;
             border: 3px solid #000; background: #fff;
@@ -229,14 +243,12 @@
 </head>
 <body>
 
+    <!-- Main Layout -->
     <table id="layout">
-        <!-- HEADER (22%) -->
         <tr>
             <td class="row-head">
                 <div id="header-box">
-                    <div id="menu-btn" onclick="app.toggleMenu()">
-                        <span>≡</span>
-                    </div>
+                    <div id="menu-btn" onclick="app.toggleMenu()"><span>≡</span></div>
                     <table id="time-table">
                         <tr>
                             <td id="time-cell">
@@ -248,44 +260,33 @@
                 </div>
             </td>
         </tr>
-
-        <!-- MAIN CONTENT (60%) -->
         <tr>
             <td class="row-main">
                 <table class="val-table">
                     <tr>
-                        <!-- Temp -->
                         <td class="val-cell">
                             <div class="val-container">
                                 <span id="v-temp" class="val-num">--</span>
                                 <div class="val-meta">
-                                    <div class="meta-icon">
-                                        <img src="temp.jpg" class="icon-img">
-                                    </div>
+                                    <div class="meta-icon"><img src="temp.jpg" class="icon-img"></div>
                                     <div class="meta-unit">&deg;C</div>
                                 </div>
                             </div>
                         </td>
-                        <!-- Humid -->
                         <td class="val-cell">
                             <div class="val-container">
                                 <span id="v-hum" class="val-num">--</span>
                                 <div class="val-meta">
-                                    <div class="meta-icon">
-                                        <img src="waterdrop.jpg" class="icon-img">
-                                    </div>
+                                    <div class="meta-icon"><img src="waterdrop.jpg" class="icon-img"></div>
                                     <div class="meta-unit">%</div>
                                 </div>
                             </div>
                         </td>
-                        <!-- Press -->
                         <td class="val-cell">
                             <div class="val-container">
                                 <span id="v-pres" class="val-num">--</span>
                                 <div class="val-meta">
-                                    <div class="meta-icon">
-                                        <img src="wind.jpg" class="icon-img">
-                                    </div>
+                                    <div class="meta-icon"><img src="wind.jpg" class="icon-img"></div>
                                     <div class="meta-unit">hPa</div>
                                 </div>
                             </div>
@@ -294,8 +295,6 @@
                 </table>
             </td>
         </tr>
-
-        <!-- FOOTER (18%) -->
         <tr>
             <td class="row-foot">
                 <table class="btn-table">
@@ -337,29 +336,39 @@
                     <option value="1800000">30 Min</option>
                 </select>
             </div>
-
             <button class="shutdown-btn" onclick="app.startShutdown()">
-                <img src="power.jpg" class="shutdown-icon">
-                SHUT DOWN
+                <img src="power.jpg" class="shutdown-icon">SHUT DOWN
             </button>
         </div>
     </div>
 
-    <!-- Graph Overlay -->
+    <!-- Graph Overlay (New Table Layout) -->
     <div id="graph-view" class="overlay">
-        <div id="graph-head">
-            <div class="gh-cell-left">
-                <span id="gt-temp" class="g-tab active" onclick="app.drawGraph('temp')">TEMP</span>
-                <span id="gt-hum" class="g-tab" onclick="app.drawGraph('hum')">HUMID</span>
-                <span id="gt-pres" class="g-tab" onclick="app.drawGraph('pres')">PRESS</span>
-            </div>
-            <div class="gh-cell-right">
-                <span class="close-btn" onclick="app.closeGraph()">✖</span>
-            </div>
-        </div>
-        <div id="graph-body">
-            <canvas id="g-cvs"></canvas>
-        </div>
+        <table id="graph-layout">
+            <!-- Header (20%) -->
+            <tr class="gh-row">
+                <td id="graph-head-cell">
+                    <table class="gh-content-table">
+                        <tr>
+                            <td class="gh-left">
+                                <span id="gt-temp" class="g-tab active" onclick="app.drawGraph('temp')">TEMP</span>
+                                <span id="gt-hum" class="g-tab" onclick="app.drawGraph('hum')">HUMID</span>
+                                <span id="gt-pres" class="g-tab" onclick="app.drawGraph('pres')">PRESS</span>
+                            </td>
+                            <td class="gh-right">
+                                <span class="close-btn" onclick="app.closeGraph()">✖</span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <!-- Body (80%) -->
+            <tr class="gb-row">
+                <td id="graph-body-cell">
+                    <canvas id="g-cvs"></canvas>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <!-- Message Overlay -->
@@ -401,7 +410,6 @@
 
             tick: function() {
                 var now = new Date().getTime();
-                var head = document.getElementById("header-box");
                 if (this.state.last > 0 && (now - this.state.last > 1800000)) {
                     document.body.className = "stale";
                 } else {
@@ -441,7 +449,6 @@
                 var now = new Date();
                 this.state.last = now.getTime();
 
-                // Format Values
                 var t = (d.temp !== null) ? parseFloat(d.temp).toFixed(1) : "--";
                 var h = (d.humid !== null) ? parseFloat(d.humid).toFixed(1) : "--";
                 var p = (d.press !== null) ? parseFloat(d.press).toFixed(0) : "--";
@@ -450,12 +457,10 @@
                 document.getElementById("v-hum").innerHTML = h;
                 document.getElementById("v-pres").innerHTML = p;
 
-                // Time (Huge)
                 var HH = ("0"+now.getHours()).slice(-2);
                 var MM = ("0"+now.getMinutes()).slice(-2);
                 document.getElementById("last-update-time").innerHTML = HH + ":" + MM;
 
-                // Date
                 var days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
                 var Y = now.getFullYear();
                 var M = ("0"+(now.getMonth()+1)).slice(-2);
@@ -498,12 +503,14 @@
                 var cvs = document.getElementById("g-cvs");
                 var ctx = cvs.getContext("2d");
 
+                // Force reflow for canvas size update
                 var rect = cvs.parentElement.getBoundingClientRect();
                 cvs.width = rect.width;
                 cvs.height = rect.height;
+
                 ctx.clearRect(0,0,cvs.width,cvs.height);
-                ctx.font = "30px Arial";
-                ctx.fillText("Loading History...", 30, 60);
+                ctx.font = "40px Arial";
+                ctx.fillText("Loading History...", 50, 80);
 
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", "/api/history?_=" + new Date().getTime(), true);
@@ -537,7 +544,8 @@
                 ctx.fillStyle = "#fff";
                 ctx.fillRect(0,0,W,H);
 
-                var padL = 70; var padR = 20; var padT = 20; var padB = 50;
+                // Padding for bigger labels
+                var padL = 80; var padR = 30; var padT = 30; var padB = 60;
                 var plotW = W - padL - padR;
                 var plotH = H - padT - padB;
 
@@ -565,6 +573,7 @@
                 max += rng * 0.1;
                 rng = max - min;
 
+                // Axes
                 ctx.strokeStyle = "#888";
                 ctx.lineWidth = 3;
                 ctx.beginPath();
@@ -572,37 +581,41 @@
                 ctx.moveTo(padL, H - padB); ctx.lineTo(W - padR, H - padB);
                 ctx.stroke();
 
+                // Y Labels (Bigger font)
                 ctx.fillStyle = "#000";
-                ctx.font = "20px Arial";
+                ctx.font = "24px Arial";
                 ctx.textAlign = "right";
                 ctx.textBaseline = "middle";
                 for(var k=0; k<=4; k++) {
                     var yVal = min + (rng * k / 4);
                     var yPos = H - padB - (plotH * k / 4);
                     ctx.strokeStyle = "#eee";
-                    ctx.lineWidth = 1;
+                    ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.moveTo(padL, yPos); ctx.lineTo(W - padR, yPos);
                     ctx.stroke();
                     ctx.fillText(yVal.toFixed(0), padL - 10, yPos);
                 }
 
+                // X Labels
                 ctx.textAlign = "center";
                 ctx.textBaseline = "top";
                 for(var h=0; h<=24; h+=4) {
                     var labelT = now - (h * 3600);
                     var xPos = padL + ((labelT - startT) / (24*3600)) * plotW;
                     if (xPos >= padL && xPos <= W - padR) {
-                        ctx.fillText("-" + h + "h", xPos, H - padB + 10);
+                        ctx.fillText("-" + h + "h", xPos, H - padB + 15);
                         ctx.strokeStyle = "#eee";
+                        ctx.lineWidth = 2;
                         ctx.beginPath();
                         ctx.moveTo(xPos, padT); ctx.lineTo(xPos, H - padB);
                         ctx.stroke();
                     }
                 }
 
+                // Plot Line (Thicker)
                 ctx.strokeStyle = "#000";
-                ctx.lineWidth = 5;
+                ctx.lineWidth = 6;
                 ctx.lineJoin = "round";
                 ctx.lineCap = "round";
                 ctx.beginPath();
