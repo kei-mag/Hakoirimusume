@@ -723,11 +723,11 @@
                 // We expand outwards until we have enough ticks.
                 var ticks = Math.round((graphMax - graphMin) / step);
 
-                while (ticks < 5) {
+                while (ticks < 4) {
                     // Add to top
                     graphMax += step;
                     ticks++;
-                    if (ticks >= 5) break;
+                    if (ticks >= 4) break;
 
                     // Add to bottom
                     graphMin -= step;
@@ -774,7 +774,7 @@
                 // --- 6. X Labels (Time) ---
                 ctx.textAlign = "center";
                 ctx.textBaseline = "top";
-                for(var h=0; h<=24; h+=4) {
+                for(var h=0; h<=24; h+=2) {
                     var labelT = now - (h * 3600);
                     var xPos = padL + ((labelT - startT) / (24*3600)) * plotW;
 
