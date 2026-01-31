@@ -14,7 +14,7 @@ except ImportError:
     import tomli as tomllib
 
 CONFIG_FILE = "./config.toml"
-DASHBOARD_HTML_FILE = "templates/dashboard.html"
+DASHBOARD_HTML_FILE = "public/dashboard.html"
 ACCEPT_ADDR = "0.0.0.0"
 ENV_VAL_FORM = re.compile(r"\${(.+)}")
 
@@ -213,10 +213,10 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_error(403)
                 return
 
-            # Look in templates folder as requested by user
+            # Look in public folder as requested by user
             possible_paths = [
                 path.lstrip("/"),
-                os.path.join("templates", path.lstrip("/")),
+                os.path.join("public", path.lstrip("/")),
                 os.path.join("docs", path.lstrip("/"))
             ]
 
