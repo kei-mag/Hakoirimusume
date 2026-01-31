@@ -1,197 +1,701 @@
-<!DOCTYPE HTML>
-<html lang="ja">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>うさぎ小屋温度計</title>
-    <meta http-equiv="Refresh" content="{{INTERVAL}}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hakoirimusume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
     <style type="text/css">
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
+        /* --- Base Setup --- */
+        * { box-sizing: border-box; }
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
             background-color: #ffffff;
             font-family: "Comfortaa", sans-serif;
-            font-optical-sizing: auto;
+            color: #000000;
+            user-select: none;
+        }
+
+        /* --- Layout Grid (Table) --- */
+        #layout {
+            width: 100%; height: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        /* --- Header (22%) --- */
+        .row-head { height: 22%; vertical-align: top; }
+        #header-box {
+            width: 100%; height: 100%;
+            border-bottom: 4px solid #000;
+            position: relative;
+        }
+
+        /* Menu Button */
+        #menu-btn {
+            position: absolute; top: 0; left: 0;
+            width: 80px; height: 100%;
+            line-height: 100%;
+            font-size: 60px;
+            text-align: center;
+            cursor: pointer; z-index: 10;
+            background: #fff;
+            display: table;
+        }
+        #menu-btn span {
+            display: table-cell; vertical-align: middle;
+        }
+
+        /* Time Display */
+        #time-table {
+            width: 100%; height: 100%;
+            border-collapse: collapse;
+        }
+        #time-cell {
+            text-align: right; vertical-align: middle;
+            padding-right: 15px;
+            padding-left: 90px;
+        }
+        #last-update-time {
+            /* Kindle実機に合わせて調整 (前回140px -> 今回110px) */
+            font-size: 110px;
             font-weight: 700;
-            font-style: bold;
-            font-size: 1em;
-            /* 基本フォントサイズ */
+            line-height: 0.9;
+            letter-spacing: -4px;
+            display: block;
+        }
+        #date-line {
+            font-size: 24px; font-weight: 700; color: #000;
+            margin-top: 2px; display: block; line-height: 1.0;
         }
 
-        .header {
+        /* Stale Mode */
+        .stale #header-box { background: #000; color: #fff; }
+        .stale #menu-btn { background: #000; color: #fff; }
+        .stale #date-line { color: #fff; }
+
+        /* --- Main Content (60%) --- */
+        .row-main { height: 60%; vertical-align: middle; }
+        .val-table {
+            width: 100%; height: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .val-cell {
+            width: 33.33%;
+            text-align: center; vertical-align: middle;
+            border-right: 3px solid #000;
+            padding: 0;
+        }
+        .val-cell:last-child { border-right: none; }
+
+        /* Value Styling */
+        .val-container {
+            display: inline-block;
             width: 100%;
-            text-align: center;
-            margin-top: 50px;
-            margin-bottom: 50px;
-            font-size: 1.5em;
-            /* bodyのフォントサイズの1.5倍 */
+        }
+        .val-num {
+            /* PCでは崩れるレベルの巨大サイズ指定 */
+            font-size: 160px;
+            font-weight: 700;
+            line-height: 0.8;
+            letter-spacing: -8px;
+            display: block;
+            margin-bottom: 5px;
+            padding-top: 10px; /* 上の線との間隔微調整 */
+        }
+        .val-meta {
+            display: table; margin: 0 auto;
+        }
+        .meta-icon {
+            display: table-cell; vertical-align: middle;
+            padding-right: 10px;
+        }
+        .icon-img {
+            /* アイコンは少し控えめにして数値を目立たせる */
+            width: 40px; height: 40px; display: block;
+        }
+        .meta-unit {
+            display: table-cell; vertical-align: middle;
+            font-size: 24px; font-weight: 700; color: #000;
+            text-align: left;
         }
 
-	.footer {
-            width: 100%;
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 30px;
-            font-size: 1.5em;
-            /* bodyのフォントサイズの1.5倍 */
+        /* --- Footer (18%) --- */
+        .row-foot { height: 18%; vertical-align: middle; }
+        .btn-table {
+            width: 100%; height: 100%;
+            border-collapse: collapse;
+            border-top: 4px solid #000;
+            table-layout: fixed;
         }
-
-        .columns {
-            display: -webkit-box;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: -webkit-flex;
-            display: flex;
-            justify-content: space-around;
-            -webkit-box-pack: justify;
-            -moz-box-pack: justify;
-            -webkit-justify-content: space-around;
-            -ms-justify-content: space-around;
-            width: 100%;
-            margin-bottom: 40px;
-            flex-wrap: nowrap;
-            /* 横並びを維持 */
-            overflow-x: auto;
-            /* オーバーフローを防ぐ */
-        }
-
-        .column {
-            text-align: center;
-            font-size: 1.5em;
-            /* bodyのフォントサイズの1.5倍 */
-            min-width: 100px;
-            /* 最小幅を設定してオーバーフローを防ぐ */
-            box-sizing: border-box;
-            /* パディングとボーダーを含めてサイズを計算 */
-            -webkit-box-flex: 1;
-            -moz-box-flex: 1;
-            -webkit-flex: 1;
-            -ms-flex: 1;
-            flex: 1;
-        }
-
-        .value {
-            font-size: 2.5em;
-            /* bodyのフォントサイズの2.5倍 */
-        }
-
-        .unit {
-            font-size: 1.5em;
-            /* bodyのフォントサイズ */
-        }
-
-        .button-container {
-            display: -webkit-box;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: -webkit-flex;
-            display: flex;
-            justify-content: center;
-            -webkit-box-pack: center;
-            -moz-box-pack: center;
-            -webkit-justify-content: center;
-            -ms-justify-content: center;
-            gap: 100px;
-        }
-
-        .button {
-            display: -webkit-box;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: -webkit-flex;
-            display: flex;
-            flex-direction: column;
-            -webkit-box-orient: vertical;
-            -moz-box-orient: vertical;
-            -webkit-flex-direction: column;
-            -ms-flex-direction: column;
-            align-items: center;
-            -webkit-box-align: center;
-            -moz-box-align: center;
-            -webkit-align-items: center;
-            -ms-align-items: center;
-            text-align: center;
-            font-size: 1em;
-            /* bodyのフォントサイズ */
+        .btn-cell {
+            width: 50%; height: 100%;
+            text-align: center; vertical-align: middle;
             cursor: pointer;
-            background-color: white;
-            /* 背景色を白に設定 */
-            border: none;
-            /* ボーダーを消す */
-            padding: 25px;
-            /* パディングを追加 */
-            text-decoration: none;
-            /* テキストの装飾を消す */
-            font-family: "Comfortaa", sans-serif;
-            /* Comfortaaフォントを適用 */
+            border-right: 3px solid #000;
+            background: #fff;
+        }
+        .btn-cell:last-child { border-right: none; }
+        .btn-cell:active { background: #000; color: #fff; }
+
+        .btn-content { display: inline-block; }
+        .btn-img { width: 50px; height: 50px; vertical-align: middle; margin-right: 15px; }
+        .btn-txt { font-size: 32px; font-weight: 700; vertical-align: middle; }
+
+        /* --- Overlays --- */
+        .overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #fff; z-index: 50;
+            display: none;
+        }
+        .overlay.active { display: block; }
+
+        /* Menu */
+        #menu-view { z-index: 60; }
+        .menu-header {
+            height: 90px; border-bottom: 3px solid #000;
+            text-align: right; vertical-align: middle;
+            display: table; width: 100%;
+        }
+        .menu-close-cell {
+            display: table-cell; vertical-align: middle;
+            padding-right: 20px;
+        }
+        .menu-close { font-size: 40px; font-weight: bold; cursor: pointer; }
+        .menu-content { padding: 40px; text-align: center; }
+
+        .menu-lbl { font-size: 32px; font-weight: bold; display: block; margin-bottom: 15px; }
+        select { font-size: 32px; padding: 15px; width: 100%; border: 3px solid #000; background: #fff; }
+
+        .shutdown-btn {
+            background: #000; color: #fff; border: none;
+            font-size: 32px; padding: 30px;
+            font-family: inherit; cursor: pointer; width: 100%;
+            margin-top: 60px;
+        }
+        .shutdown-icon {
+            width: 50px; height: 50px; vertical-align: middle;
+            margin-right: 20px; filter: invert(1);
         }
 
-        .button img {
-            width: 100px;
-            height: 100px;
+        /* Graph */
+        #graph-view { z-index: 55; }
+        #graph-head {
+            height: 80px; border-bottom: 3px solid #000;
+            display: table; width: 100%;
+        }
+        .gh-cell-left { display: table-cell; vertical-align: middle; padding-left: 10px; text-align: left; }
+        .gh-cell-right { display: table-cell; vertical-align: middle; padding-right: 10px; text-align: right; }
+
+        #graph-body { width: 100%; height: calc(100% - 80px); padding: 5px; }
+        .g-tab {
+            font-size: 26px; padding: 10px 20px; border: 3px solid #000;
+            margin-right: 10px; cursor: pointer; font-weight: bold;
+            display: inline-block;
+        }
+        .g-tab.active { background: #000; color: #fff; }
+        .close-btn { font-size: 40px; font-weight: bold; cursor: pointer; }
+
+        /* Toast */
+        #toast {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #000; color: #fff; text-align: center;
+            padding: 10px 0; font-size: 20px; font-weight: bold;
+            z-index: 99; display: none;
         }
 
-        @media (max-width: 600px) {
-            .columns {
-                justify-content: flex-start;
-                /* 小さい画面で左揃え */
-            }
+        /* Message */
+        #msg-table { width: 100%; height: 100%; border-collapse: collapse; }
+        #msg-cell { text-align: center; vertical-align: middle; }
+        #msg-title { font-size: 50px; font-weight: bold; margin-bottom: 30px; }
+        #msg-desc { font-size: 26px; margin-bottom: 30px; line-height: 1.4; padding: 0 20px; }
+        #msg-img { max-width: 80%; border: 3px solid #000; margin-bottom: 30px; }
 
-            .column {
-                flex: 0 0 auto;
-                /* 最小幅を保つ */
-            }
+        /* Reconnect Btn */
+        .reconnect-btn {
+            font-size: 30px; padding: 20px 40px;
+            border: 3px solid #000; background: #fff;
+            font-weight: bold; cursor: pointer;
         }
     </style>
+
+    <script type="text/javascript">
+        window.onerror = function(msg, url, line) { return true; };
+    </script>
 </head>
-
 <body>
-    <div class="header">
-        <div>Last Update : {{DATETIME}}</div>
-    </div>
-    <div class="columns">
-        <div class="column">
-            <div>Temp.</div>
-            <div class="value">{{TEMP}}</div>
-            <div class="unit">°C</div>
-        </div>
-        <div class="column">
-            <div>Hum.</div>
-            <div class="value">{{HUMID}}</div>
-            <div class="unit">%</div>
-        </div>
-        <div class="column">
-            <div>Press.</div>
-            <div class="value">{{PRESS}}</div>
-            <div class="unit">hPa</div>
-        </div>
-    </div>
-    <div class="footer">
-        <div class="button-container">
-            <div class="button" onclick="location.reload();">
-                <img src="https://icooon-mono.com/i/icon_11972/icon_119721_512.png" alt="Update">
-                <div>Update</div>
-            </div>
-            <form action="/" method="POST" class="button-form">
-                <button type="submit" class="button">
-                    <img src="https://icooon-mono.com/i/icon_00204/icon_002041_512.png" alt="Shutdown">
-                    <div>Shutdown</div>
-                </button>
-            </form>
-        </div>
-    </div>
-</body>
 
+    <table id="layout">
+        <!-- HEADER (22%) -->
+        <tr>
+            <td class="row-head">
+                <div id="header-box">
+                    <div id="menu-btn" onclick="app.toggleMenu()">
+                        <span>≡</span>
+                    </div>
+                    <table id="time-table">
+                        <tr>
+                            <td id="time-cell">
+                                <span id="last-update-time">--:--</span>
+                                <span id="date-line">----.--.-- ---</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+
+        <!-- MAIN CONTENT (60%) -->
+        <tr>
+            <td class="row-main">
+                <table class="val-table">
+                    <tr>
+                        <!-- Temp -->
+                        <td class="val-cell">
+                            <div class="val-container">
+                                <span id="v-temp" class="val-num">--</span>
+                                <div class="val-meta">
+                                    <div class="meta-icon">
+                                        <img src="temp.jpg" class="icon-img">
+                                    </div>
+                                    <div class="meta-unit">&deg;C</div>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Humid -->
+                        <td class="val-cell">
+                            <div class="val-container">
+                                <span id="v-hum" class="val-num">--</span>
+                                <div class="val-meta">
+                                    <div class="meta-icon">
+                                        <img src="waterdrop.jpg" class="icon-img">
+                                    </div>
+                                    <div class="meta-unit">%</div>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Press -->
+                        <td class="val-cell">
+                            <div class="val-container">
+                                <span id="v-pres" class="val-num">--</span>
+                                <div class="val-meta">
+                                    <div class="meta-icon">
+                                        <img src="wind.jpg" class="icon-img">
+                                    </div>
+                                    <div class="meta-unit">hPa</div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <!-- FOOTER (18%) -->
+        <tr>
+            <td class="row-foot">
+                <table class="btn-table">
+                    <tr>
+                        <td class="btn-cell" onclick="app.showGraph()">
+                            <div class="btn-content">
+                                <img src="graph.jpg" class="btn-img">
+                                <span class="btn-txt">GRAPH</span>
+                            </div>
+                        </td>
+                        <td class="btn-cell" onclick="app.manualUpdate()">
+                            <div class="btn-content">
+                                <img src="reload.jpg" class="btn-img">
+                                <span class="btn-txt">UPDATE</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <div id="toast">Connecting...</div>
+
+    <!-- Menu Overlay -->
+    <div id="menu-view" class="overlay">
+        <div class="menu-header">
+            <div class="menu-close-cell">
+                <span class="menu-close" onclick="app.toggleMenu()">✖ CLOSE</span>
+            </div>
+        </div>
+        <div class="menu-content">
+            <div class="menu-item">
+                <span class="menu-lbl">Update Interval</span>
+                <select id="set-int" onchange="app.saveConf()">
+                    <option value="60000">1 Min</option>
+                    <option value="300000">5 Min</option>
+                    <option value="600000">10 Min</option>
+                    <option value="1800000">30 Min</option>
+                </select>
+            </div>
+
+            <button class="shutdown-btn" onclick="app.startShutdown()">
+                <img src="power.jpg" class="shutdown-icon">
+                SHUT DOWN
+            </button>
+        </div>
+    </div>
+
+    <!-- Graph Overlay -->
+    <div id="graph-view" class="overlay">
+        <div id="graph-head">
+            <div class="gh-cell-left">
+                <span id="gt-temp" class="g-tab active" onclick="app.drawGraph('temp')">TEMP</span>
+                <span id="gt-hum" class="g-tab" onclick="app.drawGraph('hum')">HUMID</span>
+                <span id="gt-pres" class="g-tab" onclick="app.drawGraph('pres')">PRESS</span>
+            </div>
+            <div class="gh-cell-right">
+                <span class="close-btn" onclick="app.closeGraph()">✖</span>
+            </div>
+        </div>
+        <div id="graph-body">
+            <canvas id="g-cvs"></canvas>
+        </div>
+    </div>
+
+    <!-- Message Overlay -->
+    <div id="msg-view" class="overlay">
+        <table id="msg-table">
+            <tr>
+                <td id="msg-cell">
+                    <div id="msg-title">TITLE</div>
+                    <img id="msg-img" src="" style="display:none;">
+                    <div id="msg-desc">Description</div>
+                    <div id="msg-act"></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script type="text/javascript">
+        var app = {
+            conf: { int: 600000 },
+            state: { last: 0, timer: null, gData: null },
+
+            init: function() {
+                if (window.localStorage) {
+                    var s = localStorage.getItem("conf_int");
+                    if (s) this.conf.int = parseInt(s, 10);
+                }
+                var sel = document.getElementById("set-int");
+                if (sel) sel.value = this.conf.int;
+
+                setInterval(function() { app.tick(); }, 1000);
+                this.update();
+                this.startTimer();
+            },
+
+            startTimer: function() {
+                if (this.state.timer) clearInterval(this.state.timer);
+                this.state.timer = setInterval(function() { app.update(); }, this.conf.int);
+            },
+
+            tick: function() {
+                var now = new Date().getTime();
+                var head = document.getElementById("header-box");
+                if (this.state.last > 0 && (now - this.state.last > 1800000)) {
+                    document.body.className = "stale";
+                } else {
+                    document.body.className = "";
+                }
+            },
+
+            manualUpdate: function() {
+                this.toast("Updating...", true);
+                this.update();
+            },
+
+            update: function() {
+                var xhr = new XMLHttpRequest();
+                var ts = new Date().getTime();
+                xhr.open("GET", "/api/sensor?_=" + ts, true);
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            try {
+                                var d = JSON.parse(xhr.responseText);
+                                app.render(d);
+                                app.toast("Updated", false);
+                            } catch(e) {
+                                app.toast("Data Error", true);
+                            }
+                        } else {
+                            app.toast("Connection Failed", true);
+                        }
+                    }
+                };
+                xhr.send();
+            },
+
+            render: function(d) {
+                var now = new Date();
+                this.state.last = now.getTime();
+
+                // Format Values
+                var t = (d.temp !== null) ? parseFloat(d.temp).toFixed(1) : "--";
+                var h = (d.humid !== null) ? parseFloat(d.humid).toFixed(1) : "--";
+                var p = (d.press !== null) ? parseFloat(d.press).toFixed(0) : "--";
+
+                document.getElementById("v-temp").innerHTML = t;
+                document.getElementById("v-hum").innerHTML = h;
+                document.getElementById("v-pres").innerHTML = p;
+
+                // Time (Huge)
+                var HH = ("0"+now.getHours()).slice(-2);
+                var MM = ("0"+now.getMinutes()).slice(-2);
+                document.getElementById("last-update-time").innerHTML = HH + ":" + MM;
+
+                // Date
+                var days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+                var Y = now.getFullYear();
+                var M = ("0"+(now.getMonth()+1)).slice(-2);
+                var D = ("0"+now.getDate()).slice(-2);
+                var day = days[now.getDay()];
+                document.getElementById("date-line").innerHTML = Y+"."+M+"."+D+" "+day;
+
+                document.body.className = "";
+            },
+
+            toast: function(msg, stick) {
+                var el = document.getElementById("toast");
+                el.innerHTML = msg;
+                el.style.display = "block";
+                if (!stick) {
+                    setTimeout(function() { el.style.display = "none"; }, 2000);
+                }
+            },
+
+            toggleMenu: function() {
+                var el = document.getElementById("menu-view");
+                el.className = (el.className.indexOf("active") >= 0) ? "overlay" : "overlay active";
+            },
+            saveConf: function() {
+                var v = document.getElementById("set-int").value;
+                this.conf.int = parseInt(v, 10);
+                if (window.localStorage) localStorage.setItem("conf_int", this.conf.int);
+                this.startTimer();
+                this.toast("Saved", false);
+            },
+
+            showGraph: function() {
+                document.getElementById("graph-view").className = "overlay active";
+                this.loadGraph();
+            },
+            closeGraph: function() {
+                document.getElementById("graph-view").className = "overlay";
+            },
+            loadGraph: function() {
+                var cvs = document.getElementById("g-cvs");
+                var ctx = cvs.getContext("2d");
+
+                var rect = cvs.parentElement.getBoundingClientRect();
+                cvs.width = rect.width;
+                cvs.height = rect.height;
+                ctx.clearRect(0,0,cvs.width,cvs.height);
+                ctx.font = "30px Arial";
+                ctx.fillText("Loading History...", 30, 60);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/api/history?_=" + new Date().getTime(), true);
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        try {
+                            app.state.gData = JSON.parse(xhr.responseText);
+                            app.drawGraph("temp");
+                        } catch(e) {}
+                    }
+                };
+                xhr.send();
+            },
+            drawGraph: function(mode) {
+                var tabs = ["temp", "hum", "pres"];
+                for(var i=0; i<tabs.length; i++) {
+                    var el = document.getElementById("gt-"+tabs[i]);
+                    if (tabs[i] === mode) el.className = "g-tab active";
+                    else el.className = "g-tab";
+                }
+
+                var raw = this.state.gData;
+                if (!raw || raw.length === 0) return;
+
+                var cvs = document.getElementById("g-cvs");
+                var ctx = cvs.getContext("2d");
+                var W = cvs.width;
+                var H = cvs.height;
+
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(0,0,W,H);
+
+                var padL = 70; var padR = 20; var padT = 20; var padB = 50;
+                var plotW = W - padL - padR;
+                var plotH = H - padT - padB;
+
+                var now = new Date().getTime() / 1000;
+                var startT = now - (24 * 3600);
+
+                var min = 9999; var max = -9999;
+                var key = (mode==="hum")?"humid":((mode==="pres")?"press":"temp");
+
+                var pts = [];
+                for(var j=0; j<raw.length; j++) {
+                    var r = raw[j];
+                    if (r[key] !== null) {
+                        if (r[key] < min) min = r[key];
+                        if (r[key] > max) max = r[key];
+                        pts.push({ t: r.ts, v: r[key] });
+                    }
+                }
+
+                if (pts.length === 0) return;
+
+                var rng = max - min;
+                if (rng === 0) rng = 1;
+                min -= rng * 0.1;
+                max += rng * 0.1;
+                rng = max - min;
+
+                ctx.strokeStyle = "#888";
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(padL, padT); ctx.lineTo(padL, H - padB);
+                ctx.moveTo(padL, H - padB); ctx.lineTo(W - padR, H - padB);
+                ctx.stroke();
+
+                ctx.fillStyle = "#000";
+                ctx.font = "20px Arial";
+                ctx.textAlign = "right";
+                ctx.textBaseline = "middle";
+                for(var k=0; k<=4; k++) {
+                    var yVal = min + (rng * k / 4);
+                    var yPos = H - padB - (plotH * k / 4);
+                    ctx.strokeStyle = "#eee";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(padL, yPos); ctx.lineTo(W - padR, yPos);
+                    ctx.stroke();
+                    ctx.fillText(yVal.toFixed(0), padL - 10, yPos);
+                }
+
+                ctx.textAlign = "center";
+                ctx.textBaseline = "top";
+                for(var h=0; h<=24; h+=4) {
+                    var labelT = now - (h * 3600);
+                    var xPos = padL + ((labelT - startT) / (24*3600)) * plotW;
+                    if (xPos >= padL && xPos <= W - padR) {
+                        ctx.fillText("-" + h + "h", xPos, H - padB + 10);
+                        ctx.strokeStyle = "#eee";
+                        ctx.beginPath();
+                        ctx.moveTo(xPos, padT); ctx.lineTo(xPos, H - padB);
+                        ctx.stroke();
+                    }
+                }
+
+                ctx.strokeStyle = "#000";
+                ctx.lineWidth = 5;
+                ctx.lineJoin = "round";
+                ctx.lineCap = "round";
+                ctx.beginPath();
+
+                var first = true;
+                for(var m=0; m<pts.length; m++) {
+                    var p = pts[m];
+                    var x = padL + ((p.t - startT) / (24*3600)) * plotW;
+                    var y = H - padB - ((p.v - min) / rng) * plotH;
+                    if (x < padL) continue;
+                    if (first) {
+                        ctx.moveTo(x, y);
+                        first = false;
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+            },
+
+            startShutdown: function() {
+                if(!confirm("Shutdown System?")) return;
+                this.showMsg("Shutting Down...", "Please wait for green LED off.", "instruction2.jpg");
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/api/shutdown", true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) app.pollDeath();
+                };
+                xhr.send();
+            },
+            pollDeath: function() {
+                var fail = 0;
+                var tm = setInterval(function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "/api/sensor?_=" + new Date().getTime(), true);
+                    xhr.timeout = 2000;
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4 && xhr.status === 200) fail = 0;
+                    };
+                    xhr.onerror = xhr.ontimeout = function() {
+                        fail++;
+                        if (fail > 3) {
+                            clearInterval(tm);
+                            app.showOff();
+                        }
+                    };
+                    xhr.send();
+                }, 3000);
+            },
+            showOff: function() {
+                document.getElementById("msg-title").innerHTML = "POWER OFF";
+                document.getElementById("msg-desc").innerHTML = "Safe to unplug.";
+                var img = document.getElementById("msg-img");
+                img.src = "docs/icon.jpg";
+                img.style.display = "inline-block";
+
+                var btn = document.createElement("button");
+                btn.innerHTML = "RECONNECT";
+                btn.className = "reconnect-btn";
+                btn.style.marginTop = "20px";
+                btn.onclick = function() { location.reload(); };
+
+                var act = document.getElementById("msg-act");
+                act.innerHTML = "";
+                act.appendChild(btn);
+
+                setInterval(function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "/api/sensor?_=" + new Date().getTime(), true);
+                    xhr.timeout = 5000;
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4 && xhr.status === 200) location.reload();
+                    };
+                    xhr.send();
+                }, 10000);
+            },
+            showMsg: function(ti, de, img) {
+                var el = document.getElementById("msg-view");
+                el.className = "overlay active";
+                document.getElementById("msg-title").innerHTML = ti;
+                document.getElementById("msg-desc").innerHTML = de;
+                var im = document.getElementById("msg-img");
+                if (img) {
+                    im.src = img;
+                    im.style.display = "inline-block";
+                } else {
+                    im.style.display = "none";
+                }
+                document.getElementById("msg-act").innerHTML = "";
+            }
+        };
+
+        window.onload = function() { app.init(); };
+    </script>
+</body>
 </html>
