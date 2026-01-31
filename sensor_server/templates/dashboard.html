@@ -25,58 +25,66 @@
             table-layout: fixed;
         }
 
-        /* --- Header (22%) --- */
-        .row-head { height: 22%; vertical-align: top; }
+        /* --- Header (14%) --- */
+        /* 12% -> 14% (中間サイズ) */
+        .row-head { height: 14%; vertical-align: middle; }
         #header-box {
             width: 100%; height: 100%;
             border-bottom: 4px solid #000;
             position: relative;
         }
 
-        /* Menu Button */
-        #menu-btn {
+        /* Connection Icon (Top Left) */
+        #conn-status {
             position: absolute; top: 0; left: 0;
-            width: 90px; height: 100%;
+            width: 100px; height: 100%; /* 幅を少し調整 */
+            display: table;
+            text-align: center;
+            z-index: 10;
+        }
+        .conn-cell { display: table-cell; vertical-align: middle; }
+        #conn-img { width: 45px; height: 45px; vertical-align: middle; }
+
+        /* Menu Button (Top Right) */
+        #menu-btn {
+            position: absolute; top: 0; right: 0;
+            width: 100px; height: 100%;
             line-height: 100%;
-            font-size: 70px;
+            font-size: 55px;
             text-align: center;
             cursor: pointer; z-index: 10;
             background: #fff;
             display: table;
         }
-        #menu-btn span {
-            display: table-cell; vertical-align: middle;
-        }
+        #menu-btn span { display: table-cell; vertical-align: middle; }
 
-        /* Time Display */
+        /* Time Display (Center) - 1行で大きく */
         #time-table {
             width: 100%; height: 100%;
             border-collapse: collapse;
         }
         #time-cell {
-            text-align: right; vertical-align: middle;
-            padding-right: 10px;
-            padding-left: 90px;
+            text-align: center; vertical-align: middle;
+            /* アイコンとメニューの分を避ける */
+            padding-left: 80px; padding-right: 80px;
         }
-        #last-update-time {
-            font-size: 140px;
-            font-weight: 700;
-            line-height: 0.8;
-            letter-spacing: -6px;
+        #time-val {
+            /* 1行に収まる範囲で最大化 */
+            font-size: 50px;
+            font-weight: 700; color: #000;
             display: block;
-        }
-        #date-line {
-            font-size: 26px; font-weight: 700; color: #000;
-            margin-top: 5px; display: block; line-height: 1.0;
+            line-height: 1.0;
+            white-space: nowrap;
         }
 
         /* Stale Mode */
         .stale #header-box { background: #000; color: #fff; }
         .stale #menu-btn { background: #000; color: #fff; }
-        .stale #date-line { color: #fff; }
+        .stale #time-val { color: #fff; }
 
-        /* --- Main Content (60%) --- */
-        .row-main { height: 60%; vertical-align: middle; }
+        /* --- Main Content (72%) --- */
+        /* 76% -> 72% */
+        .row-main { height: 70%; vertical-align: middle; }
         .val-table {
             width: 100%; height: 100%;
             border-collapse: collapse;
@@ -85,42 +93,57 @@
         .val-cell {
             width: 33.33%;
             text-align: center; vertical-align: middle;
-            border-right: 3px solid #000;
             padding: 0;
+            border: none;
         }
-        .val-cell:last-child { border-right: none; }
 
         /* Value Styling */
         .val-container {
             display: inline-block;
             width: 100%;
         }
-        .val-num {
-            font-size: 110px;
-            font-weight: 700;
-            line-height: 0.9;
-            letter-spacing: -4px;
+
+        /* 1. Icon */
+        .val-icon {
             display: block;
-            margin-bottom: 10px;
-        }
-        .val-meta {
-            display: table; margin: 0 auto;
-        }
-        .meta-icon {
-            display: table-cell; vertical-align: middle;
-            padding-right: 10px;
+            margin-bottom: 5px;
         }
         .icon-img {
-            width: 50px; height: 50px; display: block;
-        }
-        .meta-unit {
-            display: table-cell; vertical-align: middle;
-            font-size: 32px; font-weight: 700; color: #000;
-            text-align: left;
+            width: 80px; height: 80px;
+            display: inline-block;
         }
 
-        /* --- Footer (18%) --- */
-        .row-foot { height: 18%; vertical-align: middle; }
+        /* 2. Label */
+        .val-label {
+            display: block;
+            font-size: 40px; font-weight: 700;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        /* 3. Value (Big) */
+        .val-num {
+            font-size: 140px; /* サイズ維持 */
+            font-weight: 700;
+            line-height: 1.0;
+            letter-spacing: -6px;
+            display: block;
+            margin-bottom: 15px;
+            padding-top: 5px;
+        }
+
+        /* 4. Unit */
+        .val-unit {
+            display: block;
+            font-size: 60px;
+            font-weight: 700;
+            color: #000;
+            line-height: 1.0;
+        }
+
+        /* --- Footer (14%) --- */
+        /* 12% -> 14% (中間サイズ) */
+        .row-foot { height: 16%; vertical-align: middle; }
         .btn-table {
             width: 100%; height: 100%;
             border-collapse: collapse;
@@ -128,20 +151,32 @@
             table-layout: fixed;
         }
         .btn-cell {
-            width: 50%; height: 100%;
             text-align: center; vertical-align: middle;
             cursor: pointer;
-            border-right: 3px solid #000;
             background: #fff;
+            padding: 0;
         }
-        .btn-cell:last-child { border-right: none; }
         .btn-cell:active { background: #000; color: #fff; }
 
-        .btn-content { display: inline-block; }
-        .btn-img { width: 50px; height: 50px; vertical-align: middle; margin-right: 15px; }
-        .btn-txt { font-size: 36px; font-weight: 700; vertical-align: middle; }
+        .btn-sep {
+            width: 4px;
+            vertical-align: middle;
+            padding: 0;
+        }
+        .sep-line {
+            width: 3px;
+            height: 60%;
+            background: #000;
+            margin: 0 auto;
+        }
 
-        /* --- Overlays --- */
+        .btn-content { display: inline-block; }
+        /* アイコンサイズを少し調整 */
+        .btn-img { width: 50px; height: 50px; vertical-align: middle; margin-right: 8px; }
+        /* フォントサイズは維持 */
+        .btn-txt { font-size: 50px; font-weight: 700; vertical-align: middle; }
+
+        /* --- Overlays (Unchanged) --- */
         .overlay {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
@@ -153,7 +188,7 @@
         /* Menu */
         #menu-view { z-index: 60; }
         .menu-header {
-            height: 90px; border-bottom: 3px solid #000;
+            height: 80px; border-bottom: 3px solid #000;
             text-align: right; vertical-align: middle;
             display: table; width: 100%;
         }
@@ -178,31 +213,21 @@
             margin-right: 20px; filter: invert(1);
         }
 
-        /* --- Graph View (New Table Layout) --- */
+        /* --- Graph View --- */
         #graph-view { z-index: 55; background: #fff; }
         #graph-layout {
             width: 100%; height: 100%;
             border-collapse: collapse; table-layout: fixed;
         }
-        /* Header (20%) */
         .gh-row { height: 20%; vertical-align: middle; }
-        #graph-head-cell {
-            border-bottom: 4px solid #000;
-            padding: 0 10px;
-        }
-        /* Graph Body (80%) */
+        #graph-head-cell { border-bottom: 4px solid #000; padding: 0 10px; }
         .gb-row { height: 80%; vertical-align: middle; }
-        #graph-body-cell {
-            padding: 0; /* Full bleed */
-            position: relative;
-        }
+        #graph-body-cell { padding: 0; position: relative; }
 
-        /* Header Content layout */
         .gh-content-table { width: 100%; height: 100%; }
         .gh-left { text-align: left; vertical-align: middle; }
         .gh-right { text-align: right; vertical-align: middle; }
 
-        /* Controls */
         .g-tab {
             font-size: 28px; padding: 15px 25px; border: 3px solid #000;
             margin-right: 10px; cursor: pointer; font-weight: bold;
@@ -211,10 +236,7 @@
         .g-tab.active { background: #000; color: #fff; }
         .close-btn { font-size: 50px; font-weight: bold; cursor: pointer; }
 
-        /* Canvas */
-        #g-cvs {
-            display: block; width: 100%; height: 100%;
-        }
+        #g-cvs { display: block; width: 100%; height: 100%; }
 
         /* Toast */
         #toast {
@@ -248,15 +270,24 @@
         <tr>
             <td class="row-head">
                 <div id="header-box">
-                    <div id="menu-btn" onclick="app.toggleMenu()"><span>≡</span></div>
+                    <!-- Left: Connection Icon -->
+                    <div id="conn-status">
+                        <div class="conn-cell">
+                            <img id="conn-img" src="connected.jpg">
+                        </div>
+                    </div>
+
+                    <!-- Center: Time (1 Line, Big, with Seconds) -->
                     <table id="time-table">
                         <tr>
                             <td id="time-cell">
-                                <span id="last-update-time">--:--</span>
-                                <span id="date-line">----.--.-- ---</span>
+                                <span id="time-val">--.--.-- --- --:--:--</span>
                             </td>
                         </tr>
                     </table>
+
+                    <!-- Right: Menu Button -->
+                    <div id="menu-btn" onclick="app.toggleMenu()"><span>≡</span></div>
                 </div>
             </td>
         </tr>
@@ -264,31 +295,31 @@
             <td class="row-main">
                 <table class="val-table">
                     <tr>
+                        <!-- Temp -->
                         <td class="val-cell">
                             <div class="val-container">
-                                <span id="v-temp" class="val-num">--</span>
-                                <div class="val-meta">
-                                    <div class="meta-icon"><img src="temp.jpg" class="icon-img"></div>
-                                    <div class="meta-unit">&deg;C</div>
-                                </div>
+                                <div class="val-icon"><img src="temp.jpg" class="icon-img"></div>
+                                <div class="val-label">Temp.</div>
+                                <div id="v-temp" class="val-num">--</div>
+                                <div class="val-unit">&deg;C</div>
                             </div>
                         </td>
+                        <!-- Humid -->
                         <td class="val-cell">
                             <div class="val-container">
-                                <span id="v-hum" class="val-num">--</span>
-                                <div class="val-meta">
-                                    <div class="meta-icon"><img src="waterdrop.jpg" class="icon-img"></div>
-                                    <div class="meta-unit">%</div>
-                                </div>
+                                <div class="val-icon"><img src="waterdrop.jpg" class="icon-img"></div>
+                                <div class="val-label">Hum.</div>
+                                <div id="v-hum" class="val-num">--</div>
+                                <div class="val-unit">%</div>
                             </div>
                         </td>
+                        <!-- Press -->
                         <td class="val-cell">
                             <div class="val-container">
-                                <span id="v-pres" class="val-num">--</span>
-                                <div class="val-meta">
-                                    <div class="meta-icon"><img src="wind.jpg" class="icon-img"></div>
-                                    <div class="meta-unit">hPa</div>
-                                </div>
+                                <div class="val-icon"><img src="wind.jpg" class="icon-img"></div>
+                                <div class="val-label">Press.</div>
+                                <div id="v-pres" class="val-num">--</div>
+                                <div class="val-unit">hPa</div>
                             </div>
                         </td>
                     </tr>
@@ -304,6 +335,10 @@
                                 <img src="graph.jpg" class="btn-img">
                                 <span class="btn-txt">GRAPH</span>
                             </div>
+                        </td>
+                        <!-- Separator with margin -->
+                        <td class="btn-sep">
+                            <div class="sep-line"></div>
                         </td>
                         <td class="btn-cell" onclick="app.manualUpdate()">
                             <div class="btn-content">
@@ -342,10 +377,9 @@
         </div>
     </div>
 
-    <!-- Graph Overlay (New Table Layout) -->
+    <!-- Graph Overlay -->
     <div id="graph-view" class="overlay">
         <table id="graph-layout">
-            <!-- Header (20%) -->
             <tr class="gh-row">
                 <td id="graph-head-cell">
                     <table class="gh-content-table">
@@ -362,7 +396,6 @@
                     </table>
                 </td>
             </tr>
-            <!-- Body (80%) -->
             <tr class="gb-row">
                 <td id="graph-body-cell">
                     <canvas id="g-cvs"></canvas>
@@ -398,6 +431,7 @@
                 var sel = document.getElementById("set-int");
                 if (sel) sel.value = this.conf.int;
 
+                // Kindle Trailing Comma Warning: Do not leave commas at end of lists/objects
                 setInterval(function() { app.tick(); }, 1000);
                 this.update();
                 this.startTimer();
@@ -409,8 +443,11 @@
             },
 
             tick: function() {
-                var now = new Date().getTime();
-                if (this.state.last > 0 && (now - this.state.last > 1800000)) {
+                var now = new Date();
+                var ts = now.getTime();
+
+                // Stale check
+                if (this.state.last > 0 && (ts - this.state.last > 1800000)) {
                     document.body.className = "stale";
                 } else {
                     document.body.className = "";
@@ -422,10 +459,30 @@
                 this.update();
             },
 
+            setConnIcon: function(ok) {
+                var img = document.getElementById("conn-img");
+                var target = ok ? "connected.jpg" : "notconnected.jpg";
+                // Only update if src is different to avoid flicker
+                if (img.src.indexOf(target) === -1) {
+                    img.src = target;
+                }
+            },
+
             update: function() {
                 var xhr = new XMLHttpRequest();
                 var ts = new Date().getTime();
                 xhr.open("GET", "/api/sensor?_=" + ts, true);
+
+                // Timeout handling for connection status
+                xhr.timeout = 10000;
+                xhr.ontimeout = function() {
+                    app.toast("Connection Timeout", true);
+                    app.setConnIcon(false);
+                };
+                xhr.onerror = function() {
+                    app.toast("Network Error", true);
+                    app.setConnIcon(false);
+                };
 
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4) {
@@ -434,11 +491,14 @@
                                 var d = JSON.parse(xhr.responseText);
                                 app.render(d);
                                 app.toast("Updated", false);
+                                app.setConnIcon(true);
                             } catch(e) {
                                 app.toast("Data Error", true);
+                                app.setConnIcon(false);
                             }
                         } else {
-                            app.toast("Connection Failed", true);
+                            app.toast("Connection Failed: " + xhr.status, true);
+                            app.setConnIcon(false);
                         }
                     }
                 };
@@ -457,16 +517,20 @@
                 document.getElementById("v-hum").innerHTML = h;
                 document.getElementById("v-pres").innerHTML = p;
 
-                var HH = ("0"+now.getHours()).slice(-2);
-                var MM = ("0"+now.getMinutes()).slice(-2);
-                document.getElementById("last-update-time").innerHTML = HH + ":" + MM;
-
+                // Time Update (Only on success)
                 var days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
                 var Y = now.getFullYear();
                 var M = ("0"+(now.getMonth()+1)).slice(-2);
                 var D = ("0"+now.getDate()).slice(-2);
                 var day = days[now.getDay()];
-                document.getElementById("date-line").innerHTML = Y+"."+M+"."+D+" "+day;
+                var HH = ("0"+now.getHours()).slice(-2);
+                var MM = ("0"+now.getMinutes()).slice(-2);
+                var SS = ("0"+now.getSeconds()).slice(-2);
+
+                // Format: 2026.01.31 SAT 15:27:30
+                var timeStr = Y + "." + M + "." + D + " " + day + " " + HH + ":" + MM + ":" + SS;
+                var el = document.getElementById("time-val");
+                if(el) el.innerHTML = timeStr;
 
                 document.body.className = "";
             },
@@ -503,7 +567,6 @@
                 var cvs = document.getElementById("g-cvs");
                 var ctx = cvs.getContext("2d");
 
-                // Force reflow for canvas size update
                 var rect = cvs.parentElement.getBoundingClientRect();
                 cvs.width = rect.width;
                 cvs.height = rect.height;
@@ -544,7 +607,6 @@
                 ctx.fillStyle = "#fff";
                 ctx.fillRect(0,0,W,H);
 
-                // Padding for bigger labels
                 var padL = 80; var padR = 30; var padT = 30; var padB = 60;
                 var plotW = W - padL - padR;
                 var plotH = H - padT - padB;
@@ -581,7 +643,7 @@
                 ctx.moveTo(padL, H - padB); ctx.lineTo(W - padR, H - padB);
                 ctx.stroke();
 
-                // Y Labels (Bigger font)
+                // Y Labels
                 ctx.fillStyle = "#000";
                 ctx.font = "24px Arial";
                 ctx.textAlign = "right";
@@ -613,7 +675,7 @@
                     }
                 }
 
-                // Plot Line (Thicker)
+                // Plot Line
                 ctx.strokeStyle = "#000";
                 ctx.lineWidth = 6;
                 ctx.lineJoin = "round";
