@@ -479,7 +479,7 @@
 
     <script type="text/javascript">
         var app = {
-            conf: { int: 600000 },
+            conf: { int: 300000 },
             state: { last: 0, timer: null, gData: null },
 
             init: function() {
@@ -512,7 +512,7 @@
             },
 
             manualUpdate: function() {
-                this.toast("Updating...", true);
+                this.toast("Updating...", false);
                 this.update();
             },
 
@@ -549,7 +549,7 @@
                             try {
                                 var d = JSON.parse(xhr.responseText);
                                 app.render(d);
-                                app.toast("Updated", false);
+                                // app.toast("Updated", false);
                                 app.setConnIcon(true);
                             } catch(e) {
                                 app.toast("Data Error", true);
@@ -645,36 +645,27 @@
                 };
                 xhr.send();
             },
+
             drawGraph: function(mode) {
-              var tabs = ["temp", "hum", "pres"];
+                // --- 1. Tab & Icon Logic ---
+                var tabs = ["temp", "hum", "pres"];
                 for(var i=0; i<tabs.length; i++) {
                     var name = tabs[i];
                     var el = document.getElementById("gt-" + name);
                     var img = el.getElementsByTagName("img")[0];
-
                     var src = img.src;
-
                     var isInverted = (src.indexOf("_inverted.png") !== -1);
 
                     if (name === mode) {
-                        // Activate (black background)
                         el.className = "g-tab active";
-
-                        // Change to inverted image
-                        if (!isInverted) {
-                            img.src = src.replace(".png", "_inverted.png");
-                        }
+                        if (!isInverted) img.src = src.replace(".png", "_inverted.png");
                     } else {
-                        // Deactivate (white background)
                         el.className = "g-tab";
-
-                        // Change to normal image
-                        if (isInverted) {
-                            img.src = src.replace("_inverted.png", ".png");
-                        }
+                        if (isInverted) img.src = src.replace("_inverted.png", ".png");
                     }
                 }
 
+                // --- 2. Data Preparation ---
                 var raw = this.state.gData;
                 if (!raw || raw.length === 0) return;
 
@@ -683,69 +674,117 @@
                 var W = cvs.width;
                 var H = cvs.height;
 
+                // Clear
                 ctx.fillStyle = "#fff";
                 ctx.fillRect(0,0,W,H);
 
-                var padL = 80; var padR = 30; var padT = 30; var padB = 60;
+                // Margins
+                var padL = 90; var padR = 30; var padT = 30; var padB = 60;
                 var plotW = W - padL - padR;
                 var plotH = H - padT - padB;
 
                 var now = new Date().getTime() / 1000;
                 var startT = now - (24 * 3600);
 
-                var min = 9999; var max = -9999;
+                // Find Min/Max
+                var min = 99999; var max = -99999;
                 var key = (mode==="hum")?"humid":((mode==="pres")?"press":"temp");
 
                 var pts = [];
                 for(var j=0; j<raw.length; j++) {
                     var r = raw[j];
-                    if (r[key] !== null) {
-                        if (r[key] < min) min = r[key];
-                        if (r[key] > max) max = r[key];
-                        pts.push({ t: r.ts, v: r[key] });
+                    var val = parseFloat(r[key]);
+                    if (!isNaN(val)) {
+                        if (val < min) min = val;
+                        if (val > max) max = val;
+                        pts.push({ t: r.ts, v: val });
                     }
                 }
-
                 if (pts.length === 0) return;
 
-                var rng = max - min;
-                if (rng === 0) rng = 1;
-                min -= rng * 0.1;
-                max += rng * 0.1;
-                rng = max - min;
+                // --- 3. Simple Integer Scale Algorithm ---
 
-                // Axes
+                // A. Determine Step Size (Integer >= 1)
+                // We want max 10 ticks.
+                var dataRange = max - min;
+                if (dataRange < 0) dataRange = 0;
+
+                // If range is 12, step=2. If range is 0.5, step=1.
+                var rawStep = dataRange / 10;
+                var step = Math.ceil(rawStep);
+                if (step < 1) step = 1;
+
+                // B. Align Min/Max to Step
+                var graphMin = Math.floor(min / step) * step;
+                var graphMax = Math.ceil(max / step) * step;
+
+                // C. Ensure at least 5 ticks (Expand range if needed)
+                // Current ticks = (graphMax - graphMin) / step
+                // We expand outwards until we have enough ticks.
+                var ticks = Math.round((graphMax - graphMin) / step);
+
+                while (ticks < 5) {
+                    // Add to top
+                    graphMax += step;
+                    ticks++;
+                    if (ticks >= 5) break;
+
+                    // Add to bottom
+                    graphMin -= step;
+                    ticks++;
+                }
+
+                // Final Range
+                var graphRange = graphMax - graphMin;
+
+                // --- 4. Draw Axes ---
                 ctx.strokeStyle = "#888";
                 ctx.lineWidth = 3;
                 ctx.beginPath();
-                ctx.moveTo(padL, padT); ctx.lineTo(padL, H - padB);
-                ctx.moveTo(padL, H - padB); ctx.lineTo(W - padR, H - padB);
+                ctx.moveTo(padL, padT); ctx.lineTo(padL, H - padB); // Y-axis
+                ctx.moveTo(padL, H - padB); ctx.lineTo(W - padR, H - padB); // X-axis
                 ctx.stroke();
 
-                // Y Labels
+                // --- 5. Draw Y-Ticks (Integer Loop) ---
                 ctx.fillStyle = "#000";
-                ctx.font = "24px Arial";
+                ctx.font = "20px Arial";
                 ctx.textAlign = "right";
                 ctx.textBaseline = "middle";
-                for(var k=0; k<=4; k++) {
-                    var yVal = min + (rng * k / 4);
-                    var yPos = H - padB - (plotH * k / 4);
+
+                // Loop exactly "ticks" times + 1 (for 0 to N)
+                for (var i = 0; i <= ticks; i++) {
+                    var val = graphMin + (i * step);
+
+                    // Calculate Y position
+                    // Y = Bottom - (Ratio * Height)
+                    var ratio = (val - graphMin) / graphRange;
+                    var yPos = H - padB - (ratio * plotH);
+
+                    // Grid line
                     ctx.strokeStyle = "#eee";
                     ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.moveTo(padL, yPos); ctx.lineTo(W - padR, yPos);
                     ctx.stroke();
-                    ctx.fillText(yVal.toFixed(0), padL - 10, yPos);
+
+                    // Label (No decimals)
+                    ctx.fillText(val.toFixed(0), padL - 10, yPos);
                 }
 
-                // X Labels
+                // --- 6. X Labels (Time) ---
                 ctx.textAlign = "center";
                 ctx.textBaseline = "top";
                 for(var h=0; h<=24; h+=4) {
                     var labelT = now - (h * 3600);
                     var xPos = padL + ((labelT - startT) / (24*3600)) * plotW;
-                    if (xPos >= padL && xPos <= W - padR) {
-                        ctx.fillText("-" + h + "h", xPos, H - padB + 15);
+
+                    // Draw if within range (with slight buffer)
+                    if (xPos >= padL - 10 && xPos <= W - padR + 10) {
+                        if (h === 0) {
+                            ctx.fillText("now", xPos, H - padB + 15);
+                        } else {
+                            ctx.fillText("-" + h + "h", xPos, H - padB + 15);
+                        }
                         ctx.strokeStyle = "#eee";
                         ctx.lineWidth = 2;
                         ctx.beginPath();
@@ -754,7 +793,7 @@
                     }
                 }
 
-                // Plot Line
+                // --- 7. Plot Line ---
                 ctx.strokeStyle = "#000";
                 ctx.lineWidth = 6;
                 ctx.lineJoin = "round";
@@ -765,8 +804,10 @@
                 for(var m=0; m<pts.length; m++) {
                     var p = pts[m];
                     var x = padL + ((p.t - startT) / (24*3600)) * plotW;
-                    var y = H - padB - ((p.v - min) / rng) * plotH;
+                    var y = H - padB - ((p.v - graphMin) / graphRange) * plotH;
+
                     if (x < padL) continue;
+
                     if (first) {
                         ctx.moveTo(x, y);
                         first = false;
@@ -776,20 +817,20 @@
                 }
                 ctx.stroke();
 
-                // Plot Points (Dots on data)
-                ctx.fillStyle = "#000";
-                ctx.beginPath();
-                for(var m=0; m<pts.length; m++) {
-                    var p = pts[m];
-                    var x = padL + ((p.t - startT) / (24*3600)) * plotW;
-                    var y = H - padB - ((p.v - min) / rng) * plotH;
-                    if (x < padL) continue;
+                // --- 8. Plot Points ---
+                // ctx.fillStyle = "#000";
+                // ctx.beginPath();
+                // for(var m=0; m<pts.length; m++) {
+                //     var p = pts[m];
+                //     var x = padL + ((p.t - startT) / (24*3600)) * plotW;
+                //     var y = H - padB - ((p.v - graphMin) / graphRange) * plotH;
 
-                    // Draw tiny dot (radius 4px)
-                    ctx.moveTo(x + 4, y);
-                    ctx.arc(x, y, 4, 0, Math.PI * 2);
-                }
-                ctx.fill();
+                //     if (x < padL) continue;
+
+                //     ctx.moveTo(x + 4, y);
+                //     ctx.arc(x, y, 4, 0, Math.PI * 2);
+                // }
+                // ctx.fill();
             },
 
             startShutdown: function() {
