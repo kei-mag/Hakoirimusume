@@ -5,8 +5,10 @@ import os
 import re
 import csv
 from urllib.parse import parse_qs, urlparse
+from logging import getLogger
 
 import imgur
+import s3
 
 try:
     import tomllib
@@ -28,30 +30,31 @@ sensor_data_file = "./sensor_data.csv"
 log_level = "ALL"
 # ---------------------------------
 
+logger = getLogger("sensor_server")
 camera = None
 bme280 = None
 
 def main():
     global camera, bme280
     os.chdir(os.path.dirname(__file__))
-    print("Hakoirimusume Sensor Server (Enhanced)")
+    print("Hakoirimusume Sensor Server")
     load_config()
 
     # Initialize Devices
     try:
         from bme280 import BME280
         bme280 = BME280(i2c_bus, i2c_addr)
-        print("BME280 initialized.")
+        logger.info("BME280 initialized.")
     except Exception as e:
-        print("BME280 Init Error: ", e)
+        logger.error("BME280 Init Error: ", e)
 
     if enable_camera:
         try:
             from picamera import PiCamera
             camera = PiCamera()
-            print("PiCamera initialized.")
+            logger.info("PiCamera initialized.")
         except Exception as e:
-            print("PiCamera Init Error: ", e)
+            logger.error("PiCamera Init Error: ", e)
 
     # Start Server
     server_address = (ACCEPT_ADDR, port)
@@ -62,12 +65,12 @@ def main():
         ServerClass = http.server.HTTPServer
 
     with ServerClass(server_address, CustomHTTPRequestHandler) as httpd:
-        print(f"Serving at {ACCEPT_ADDR}:{port}")
+        logger.info(f"Serving at {ACCEPT_ADDR}:{port}")
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
             pass
-    print("Stopped server.")
+    logger.info("Stopped server.")
 
 
 def dict_get(d, key, default=None):
@@ -97,7 +100,7 @@ def load_config():
         sensor_data_file = os.path.abspath(sensor_data_file)
         os.chdir(cwd)
     except Exception as e:
-        print(f"Config load failed: {e}")
+        logger.error(f"Config load failed: {e}")
 
 
 def replace_env(value):
@@ -126,7 +129,7 @@ def write_log(timestamp, temp, hum, press, image_url=None, deletehash=None):
         with open(sensor_data_file, "a") as file:
             file.write(f"{timestamp},{temp},{hum},{press},{image_url},{deletehash}\n")
     except Exception as e:
-        print(f"Log write error: {e}")
+        logger.error(f"Log write error: {e}")
 
 
 def read_history_24h():
@@ -177,7 +180,7 @@ def read_history_24h():
         data.reverse()
 
     except Exception as e:
-        print(f"History read error: {e}")
+        logger.error(f"History read error: {e}")
 
     return data
 
@@ -242,7 +245,7 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 try:
                     temp, press, humid = bme280.read_data()
                 except Exception as e:
-                    print("BME280 Read Error: ", e)
+                    logger.error("BME280 Read Error: ", e)
 
             cur_timestamp = get_current_iso_timestamp()
             cur_time_obj = datetime.datetime.now().astimezone()
@@ -260,17 +263,31 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 if camera:
                     try:
                         image = camera.capture_bytes()
-                        desc = f"T:{temp}, H:{humid}, P:{press}"
-                        ret = imgur.upload_as_anonymous(
-                            imgur_client_id,
-                            image,
-                            capture_datetime=cur_time_obj.strftime("%Y/%m/%d %H:%M:%S"),
-                            description=desc
-                        )
-                        if isinstance(ret, tuple) and len(ret) == 2:
-                            content["photo"], content["deletehash"] = ret
+                        # desc = f"T:{temp}, H:{humid}, P:{press}"
+                        # ret = imgur.upload_as_anonymous(
+                        #     imgur_client_id,
+                        #     image,
+                        #     capture_datetime=cur_time_obj.strftime("%Y/%m/%d %H:%M:%S"),
+                        #     description=desc
+                        # )
+                        # if isinstance(ret, tuple) and len(ret) == 2:
+                        #     content["photo"], content["deletehash"] = ret
+                        # Use S3 due to Imgur API's end of support
+                        url = s3.upload_file(image, "hakoirimusume", object_name=cur_time_obj.strftime("%Y-%m-%d_%H-%M-%S.png"), ExtraArgs={
+                            'ACL': 'public-read',
+                            'Metadata': {
+                                'captured_at': cur_time_obj.isoformat(),
+                                'temperature': temp,
+                                'humidity': humid,
+                                'pressure': press
+                            }
+                        })
+                        if url:
+                            content["photo"], content["deletehash"] = url, None
+                        else:
+                            logger.error("Failed to upload image")
                     except Exception as e:
-                        print("Camera Error: ", e)
+                        logger.error("Camera Error: ", e)
 
                 write_log(cur_timestamp, temp, humid, press, content.get("photo"), content.get("deletehash"))
             else:
@@ -293,7 +310,7 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             try:
                 os.system("sudo shutdown -h now")
             except Exception as e:
-                print(f"Shutdown failed: {e}")
+                logger.error(f"Shutdown failed: {e}")
 
         else:
             self.send_error(404)

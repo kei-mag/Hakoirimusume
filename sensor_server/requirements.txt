@@ -1,3 +1,6 @@
 # You don't need to install these dependencies if you are using default Python of Raspberry Pi OS Bookworm or later.
 requests
 tomli  # for Python 3.10 or earlier
+
+# You need to install the followings if you would like to upload image to s3 (compatible).
+boto3
