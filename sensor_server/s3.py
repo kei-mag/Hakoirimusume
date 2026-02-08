@@ -79,6 +79,7 @@ def upload_file(
             "aws_access_key_id": aws_access_key_id,
             "aws_secret_access_key": aws_secret_access_key,
             "region_name": region_name,
+            "endpoint_url": endpoint_url,
         }.items()
         if v is not None
     }

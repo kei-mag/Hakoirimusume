@@ -1,11 +1,11 @@
+import csv
 import datetime
 import http.server
 import json
 import os
 import re
-import csv
-from urllib.parse import parse_qs, urlparse
 from logging import getLogger
+from urllib.parse import parse_qs, urlparse
 
 # import imgur
 import s3
@@ -34,6 +34,7 @@ logger = getLogger("sensor_server")
 camera = None
 bme280 = None
 
+
 def main():
     global camera, bme280
     os.chdir(os.path.dirname(__file__))
@@ -43,6 +44,7 @@ def main():
     # Initialize Devices
     try:
         from bme280 import BME280
+
         bme280 = BME280(i2c_bus, i2c_addr)
         logger.info("BME280 initialized.")
     except Exception as e:
@@ -51,6 +53,7 @@ def main():
     if enable_camera:
         try:
             from picamera import PiCamera
+
             camera = PiCamera()
             logger.info("PiCamera initialized.")
         except Exception as e:
@@ -60,6 +63,7 @@ def main():
     server_address = (ACCEPT_ADDR, port)
     try:
         from http.server import ThreadingHTTPServer
+
         ServerClass = ThreadingHTTPServer
     except ImportError:
         ServerClass = http.server.HTTPServer
@@ -84,15 +88,26 @@ def dict_get(d, key, default=None):
 
 
 def load_config():
-    global port, imgur_client_id, enable_camera, i2c_bus, i2c_addr, sensor_data_file, log_level
+    global \
+        port, \
+        imgur_client_id, \
+        enable_camera, \
+        i2c_bus, \
+        i2c_addr, \
+        sensor_data_file, \
+        log_level
     try:
         config = tomllib.load(open(CONFIG_FILE, mode="rb"))
         port = replace_env(dict_get(config, "server.port", port))
-        imgur_client_id = replace_env(dict_get(config, "imgur.client-id", imgur_client_id))
+        imgur_client_id = replace_env(
+            dict_get(config, "imgur.client-id", imgur_client_id)
+        )
         enable_camera = dict_get(config, "hardware.pi-camera", enable_camera)
         i2c_bus = dict_get(config, "hardware.bme280.i2c-bus", i2c_bus)
         i2c_addr = dict_get(config, "hardware.bme280.i2c-address", i2c_addr)
-        sensor_data_file = replace_env(dict_get(config, "datalog.filepath", sensor_data_file))
+        sensor_data_file = replace_env(
+            dict_get(config, "datalog.filepath", sensor_data_file)
+        )
         log_level = dict_get(config, "datalog.level", log_level)
 
         cwd = os.getcwd()
@@ -150,7 +165,8 @@ def read_history_24h():
 
             # Iterate backwards to find relevant data
             for row in reversed(rows):
-                if len(row) < 4: continue
+                if len(row) < 4:
+                    continue
                 try:
                     # Parse timestamp
                     ts_str = row[0]
@@ -167,12 +183,14 @@ def read_history_24h():
 
                     if t is not None:
                         # Append dict
-                        data.append({
-                            "ts": dt.timestamp(), # UNIX timestamp for easier JS handling
-                            "temp": t,
-                            "humid": h,
-                            "press": p
-                        })
+                        data.append(
+                            {
+                                "ts": dt.timestamp(),  # UNIX timestamp for easier JS handling
+                                "temp": t,
+                                "humid": h,
+                                "press": p,
+                            }
+                        )
                 except ValueError:
                     continue
 
@@ -186,7 +204,6 @@ def read_history_24h():
 
 
 class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
-
     def _send_response(self, content, content_type="text/html", status=200):
         self.send_response(status)
         self.send_header("Content-Type", content_type)
@@ -220,7 +237,7 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             possible_paths = [
                 path.lstrip("/"),
                 os.path.join("public", path.lstrip("/")),
-                os.path.join("docs", path.lstrip("/"))
+                os.path.join("docs", path.lstrip("/")),
             ]
 
             served = False
@@ -229,7 +246,11 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                     try:
                         with open(p, "rb") as f:
                             ext = os.path.splitext(p)[1].lower()
-                            mime = "image/jpeg" if ext in [".jpg", ".jpeg"] else "image/png"
+                            mime = (
+                                "image/jpeg"
+                                if ext in [".jpg", ".jpeg"]
+                                else "image/png"
+                            )
                             self._send_response(f.read(), content_type=mime)
                             served = True
                             break
@@ -254,7 +275,7 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 "time": cur_timestamp,
                 "temp": temp,
                 "humid": humid,
-                "press": press
+                "press": press,
             }
 
             if "withcamera" in query:
@@ -273,15 +294,20 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                         # if isinstance(ret, tuple) and len(ret) == 2:
                         #     content["photo"], content["deletehash"] = ret
                         # Use S3 due to Imgur API's end of support
-                        url = s3.upload_file(image, "hakoirimusume", object_name=cur_time_obj.strftime("%Y-%m-%d_%H-%M-%S.png"), ExtraArgs={
-                            'ACL': 'public-read',
-                            'Metadata': {
-                                'captured_at': cur_time_obj.isoformat(),
-                                'temperature': temp,
-                                'humidity': humid,
-                                'pressure': press
-                            }
-                        })
+                        url = s3.upload_file(
+                            image,
+                            "hakoirimusume",
+                            object_name=cur_time_obj.strftime("%Y-%m-%d_%H-%M-%S.png"),
+                            ExtraArgs={
+                                "ACL": "public-read",
+                                "Metadata": {
+                                    "captured_at": cur_time_obj.isoformat(),
+                                    "temperature": str(temp),
+                                    "humidity": str(humid),
+                                    "pressure": str(press),
+                                },
+                            },
+                        )
                         if url:
                             content["photo"], content["deletehash"] = url, None
                         else:
@@ -289,7 +315,14 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                     except Exception as e:
                         logger.error("Camera Error: ", e)
 
-                write_log(cur_timestamp, temp, humid, press, content.get("photo"), content.get("deletehash"))
+                write_log(
+                    cur_timestamp,
+                    temp,
+                    humid,
+                    press,
+                    content.get("photo"),
+                    content.get("deletehash"),
+                )
             else:
                 if log_level == "ALL":
                     write_log(cur_timestamp, temp, humid, press)
@@ -302,11 +335,17 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 data = read_history_24h()
                 self._send_response(json.dumps(data), content_type="application/json")
             except Exception as e:
-                self._send_response(json.dumps({"error": str(e)}), content_type="application/json", status=500)
+                self._send_response(
+                    json.dumps({"error": str(e)}),
+                    content_type="application/json",
+                    status=500,
+                )
 
         # 5. API: Shutdown
         elif path == "/api/shutdown":
-            self._send_response(json.dumps({"status": "accepted"}), content_type="application/json")
+            self._send_response(
+                json.dumps({"status": "accepted"}), content_type="application/json"
+            )
             try:
                 os.system("sudo shutdown -h now")
             except Exception as e:
@@ -321,10 +360,13 @@ class CustomHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self._send_response("Shutting down...", content_type="text/plain")
             os.system("sudo shutdown -h now")
         elif self.path == "/api/shutdown":
-            self._send_response(json.dumps({"status": "accepted"}), content_type="application/json")
+            self._send_response(
+                json.dumps({"status": "accepted"}), content_type="application/json"
+            )
             os.system("sudo shutdown -h now")
         else:
             self.send_error(404)
+
 
 if __name__ == "__main__":
     main()
