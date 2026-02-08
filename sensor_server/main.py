@@ -7,7 +7,7 @@ import csv
 from urllib.parse import parse_qs, urlparse
 from logging import getLogger
 
-import imgur
+# import imgur
 import s3
 
 try:
